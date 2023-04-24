@@ -1,0 +1,491 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>android view、事件分发、滑动冲突处理、Scroller | 逆风而行的蟋蟀</title><meta name="author" content="ajun"><meta name="copyright" content="ajun"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="android view、事件分发、滑动冲突处理、Scroller一、前言自定义view原理、绘制、事件分发拦截、滑动冲突等是android开发者需要熟悉的。 二、view结构、布局view树结构图    View定义 View类是所有用来构建用户界面的组件的基类   一个Viw对象占用屏幕上的一个矩形区域，它负责界面的绘制和事件处理 手机屏幕上所有看得见摸得着的都是View  常见的Vi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android view、事件分发、滑动冲突处理、Scroller">
+<meta property="og:url" content="https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view1/index.html">
+<meta property="og:site_name" content="逆风而行的蟋蟀">
+<meta property="og:description" content="android view、事件分发、滑动冲突处理、Scroller一、前言自定义view原理、绘制、事件分发拦截、滑动冲突等是android开发者需要熟悉的。 二、view结构、布局view树结构图    View定义 View类是所有用来构建用户界面的组件的基类   一个Viw对象占用屏幕上的一个矩形区域，它负责界面的绘制和事件处理 手机屏幕上所有看得见摸得着的都是View  常见的Vi">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-04-23T02:26:53.000Z">
+<meta property="article:modified_time" content="2023-04-24T05:40:33.481Z">
+<meta property="article:author" content="ajun">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'android view、事件分发、滑动冲突处理、Scroller',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-24 13:40:33'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="逆风而行的蟋蟀"><span class="site-name">逆风而行的蟋蟀</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">android view、事件分发、滑动冲突处理、Scroller</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-24T05:40:33.481Z" title="更新于 2023-04-24 13:40:33">2023-04-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="android view、事件分发、滑动冲突处理、Scroller"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+
+
+<h2 id="android-view、事件分发、滑动冲突处理、Scroller"><a href="#android-view、事件分发、滑动冲突处理、Scroller" class="headerlink" title="android view、事件分发、滑动冲突处理、Scroller"></a>android view、事件分发、滑动冲突处理、Scroller</h2><h3 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h3><p>自定义view原理、绘制、事件分发拦截、滑动冲突等是android开发者需要熟悉的。</p>
+<h3 id="二、view结构、布局"><a href="#二、view结构、布局" class="headerlink" title="二、view结构、布局"></a>二、view结构、布局</h3><h4 id="view树结构图"><a href="#view树结构图" class="headerlink" title="view树结构图"></a>view树结构图</h4><img src="https://img-blog.csdnimg.cn/20200610212040210.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTIxNjU3Njk=,size_16,color_FFFFFF,t_70" alt="img" style="zoom: 50%;" />
+
+
+
+<h4 id="View定义"><a href="#View定义" class="headerlink" title="View定义"></a>View定义</h4><ol>
+<li><p>View类是所有用来构建用户界面的组件的基类<br>   一个Viw对象占用屏幕上的一个矩形区域，它负责界面的绘制和事件处理<br> 手机屏幕上所有看得见摸得着的都是View</p>
+</li>
+<li><p>常见的View:TextView,EditText,Button,ImageView,ProgressBar</p>
+</li>
+</ol>
+<h4 id="ViewGroup定义"><a href="#ViewGroup定义" class="headerlink" title="ViewGroup定义"></a>ViewGroup定义</h4><ol>
+<li>ViewGroup类是View的一个子类，是各种布局（五大布局）的基类<br>一个ViewGroup可以包含多个子View(ViewGroup)</li>
+<li>作用：控制子View的布局，view.layout(left,top,right,bottom)</li>
+<li>ViewManager.及相关方法：<br>   ①addView0:添加子View<br>   ②removeView0:删除子View<br>   ③updateViewLayout):更新子View</li>
+<li>常见的ViewGroup:LinearLayout,RelativeLayout,FrameLayout,ListView…</li>
+</ol>
+<h4 id="View的位置怎么确定"><a href="#View的位置怎么确定" class="headerlink" title="View的位置怎么确定"></a>View的位置怎么确定</h4><p>Veiw的位置，相对于View的⽗容器，也是相对坐标，由它（左上右下）四个顶点确定的。 </p>
+<img src="https://img-blog.csdn.net/20160221170553904" alt="img" style="zoom:80%;" />
+
+
+
+<p>Top：getTop()；&#x2F;&#x2F;⼦View上边界到⽗view上边界的距离<br>Left：getLeft(); &#x2F;&#x2F;⼦View左边界到⽗view左边界的距离<br>Bottom：getBottom(); &#x2F;&#x2F;⼦View下界距到⽗View上边界的距离<br>Right：getRight(); &#x2F;&#x2F;⼦View右边界到⽗view左边界的距离</p>
+<p><strong>MotionEvent中 get 和 getRaw 的区别</strong></p>
+<p>&#x2F;&#x2F;get() ：触摸点相对于其所在组件坐标系的坐标<br> event.getX();<br> event.getY();<br>&#x2F;&#x2F;getRaw() ：触摸点相对于屏幕默认坐标系的坐标<br> event.getRawX();<br> event.getRawY();</p>
+<p>如上图可得View的宽⾼与坐标的关系：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">width= right - left </span><br><span class="line"></span><br><span class="line">height= bottom - top </span><br></pre></td></tr></table></figure>
+
+<p>那么，How to 得到View的这四个参数？ </p>
+<p>View源码中它们对应mLeft,mTop,mRight,mBottom四个成员变量，获取⽅式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">left = getLeft(); top = getTop(); </span><br><span class="line"></span><br><span class="line">right = getRight(); </span><br><span class="line"></span><br><span class="line">bottom = getBottom(); </span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>注：Android 3.0开始额外增加了⼏个参数： </p>
+<p>x ,y —是View左上⾓的坐标 translationX,translationY—是View左上⾓相对于⽗容器的偏移量（默认值为0） 这⼏个参数也是相对于⽗容器的相对坐标。 它们的换算关系： x &#x3D; left +translationX; y &#x3D; top + translationY; 需注意，View在平移过程中，top,left表⽰的是原始坐上⾓的位置信息，其值不会发⽣变化。 此时发⽣改变的是x,y,translationX,translationY这四个参数。</p>
+</blockquote>
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>关于View和ViewGroup:我们需要注意以下几点：</p>
+<p> 1.手机屏幕上的整个界面只有一个根View 如何得到它：activity.getWindow0.getDecorview0一&gt;PhoneWindow$decorView 本质类型：FrameLayout 注意：setContentView0:执行添加的视图不是整个界面的根View </p>
+<p>2.一个View只会有一个父View(ViewGroup),一个ViewGroup可以有多个子View a.得到父视图：view.getParent0,可以将返回的ViewParent强转为指定的ViewGroup b.不是所有的View都能添加子view,只有ViewGroup及其子类才能添加</p>
+<p>View的实现一般是通过绘制 onDraw方法 进行，如果你要改变它的界面可以重写 onDraw，达到你的效果；</p>
+<p>ViewGroup作为一个组件容器，它可以包含任何组件，可是你必须重写他的onLayout() 方法和 onMeasure()来设置容器布局的位置和绘制它的大小才能正常显示。</p>
+<p>我们必须明白在Android View视图是没有边界的，Canvas是没有边界的，只不过我们通过绘制特定的View时对 Canvas对象进行了一定的操作，例如 : translate(平移)、clipRect(剪切)等，以便达到我们的对该Canvas对象绘制的要求 ，我们可以将这种无边界的视图称为“视图坐标”—–它不受物理屏幕限制。通常我们所理解的一个Layout布局文件只是该视图的显示区域，超过了这个显示区域将不能显示到父视图的区域中 ，对应的，我们可以将这种有边界的视图称为“布局坐标”—— 父视图给子视图分配的布局(layout)大小。而且， 一个视图的在屏幕的起始坐标位于视图坐标起始处，如下图所示。</p>
+<img src="https://img-blog.csdn.net/20140427134126140?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdmlwemp5bm8x/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="img" style="zoom: 80%;" />
+
+<p>其实是相对于父类视图的左上角坐标为原点（0，0），而不是整体ViewGroup的左上角为原点。由于布局坐标只能显示特定的一块内容，所以我们只有移动布局坐标的坐标原点就可以将视图坐标的任何位置显示出来。（注：例如cocos2D的布局就和android的布局坐标原点坐标不一样，是左下角会原点，所以会有所差异。）</p>
+<h3 id="三、view原理、生命周期"><a href="#三、view原理、生命周期" class="headerlink" title="三、view原理、生命周期"></a>三、view原理、生命周期</h3><p>View(及其⼦类)的⽣命周期及其他知识点回顾</p>
+<h4 id="1-创建对象"><a href="#1-创建对象" class="headerlink" title="1.创建对象"></a>1.创建对象</h4><p>new MyView(context)<br>加载布局⽂件,即⾃定义View必须使⽤全类名标签</p>
+<p>流程⽅法<br>①构造器<br>     Xxx(Context context)<br>    Xxx(Context context, AttributeSet set)</p>
+<p>②onFinishInflate()<br>    只有布局的⽅式才会调⽤<br>    重写的⽬的: 得到⼦View  –&gt; getChildAt(int index):index按照加载顺序排列<br>    onAttachedToWindow() –&gt; 重写: 得到⼦View<br>    补充 Activity的onResume()执⾏之后才会进⼊后⾯的流程</p>
+<h4 id="2-View的绘制原理"><a href="#2-View的绘制原理" class="headerlink" title="2.View的绘制原理"></a>2.View的绘制原理</h4><p>View的⼯作流程主要是指measure、layout、draw这三⼤流程，即测量、布局和绘制。⽆图不欢，这⾥给⼤家画了⼀个图：</p>
+<p><img src="/../../../desktop/image-20220707160351523.png" alt="image-20220707160351523"></p>
+<p>通过上⾯的图形，相信你就可以很明⽩的知道，各个环节是⼲嘛的，可以得到什么，以及它的意义所在了。下⾯再让我们进⾏具体的分析。</p>
+<h5 id="2-1-测量-mesure"><a href="#2-1-测量-mesure" class="headerlink" title="2.1 测量-mesure"></a>2.1 测量-mesure</h5><p>作⽤：计算并确定视图的⼤⼩（测量的宽&#x2F;⾼） </p>
+<p>View measure过程相关方法主要有三个</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public final void measure(int widthMeasureSpec, int heightMeasureSpec)  </span><br><span class="line">protected final void setMeasuredDimension(int measuredWidth, int measuredHeight)  </span><br><span class="line">protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)  </span><br></pre></td></tr></table></figure>
+
+<pre><code>①.mesure() ：系统在此⽅法中测量计算出当前视图的宽⾼，此⽅法不能重写
+②.onMesure()：
+    当mearure()中 计算出的视图的宽⾼就会调⽤此⽅法, 在此⽅法默认保存的视图测量的宽⾼
+    注意：视图测量的宽⾼不等同于视图的宽⾼。获取的时机不同
+    重写的意义：得到当前视图/⼦视图测量的宽⾼;保存我们⾃⼰指定的宽⾼
+</code></pre>
+<p>关于<strong>MeasureSpec</strong>:是View的内部类，内部封装了View的规格尺寸，以及View的宽高信息</p>
+<p>measure调用onMeasure，onMeasure测量宽度、高度然后调用setMeasureDimension保存测量结果，measure，setMeasureDimension是final类型，view的子类不需要重写，onMeasure在view的子类中重写。</p>
+<p>尺寸测量模式的3种类型:</p>
+<p>①<strong>UNSPECIFIED</strong>：未指定模式，父容器不限制View的大小，一般用于系统内部的测量 </p>
+<p>②<strong>AT_MOST</strong>：最大模式，对应于在xml文件中指定控件大小为wrap_content属性，子View的最终大小是父View指定的大小值，并且子View的大小不能大于这个值 </p>
+<p>③<strong>EXACTLY</strong> ：精确模式，对应于在xml文件中指定控件为match_parent属性或者是具体的数值，父容器测量出View所需的具体大小 </p>
+<p><strong>对于每一个View，都持有一个MeasureSpec，MeasureSpec保存了该View的尺寸测量模式以及具体的宽高信息，MeasureSpec受自身的LayoutParams和父容器的MeasureSpec共同影响。</strong></p>
+<p>子View自身的大小和模式是由父布局的模式和子View自身的大小综合确定的，以子View的width为例：伪代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> childWidthDimension;</span><br><span class="line"><span class="type">int</span> size = Math.<span class="built_in">max</span>(<span class="number">0</span> , parentWidth - parantPadding);</span><br><span class="line"><span class="type">int</span> childWidth = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> childMode;</span><br><span class="line"><span class="keyword">if</span> (父布局的mode == MeasureSpec.EXACTLY)&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(childWidthDimension &gt;= <span class="number">0</span>)&#123;</span><br><span class="line"></span><br><span class="line">              childWidth = childWidthDimension;</span><br><span class="line">              childMode = MeasureSpec.EXACTLY;</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(childWidthDimension == LayoutParams.MATCH_PARENT)&#123;</span><br><span class="line">        </span><br><span class="line">               childWidth = size;</span><br><span class="line">              childMode = MeasureSpec.EXACTLY;</span><br><span class="line">              </span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(childWidthDimension == LayoutParams.WRAP_CONTENT)&#123;</span><br><span class="line">        </span><br><span class="line">               childWidth = size;</span><br><span class="line">              childMode = MeasureSpec.AT_MOST;</span><br><span class="line">              </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">&#125;<span class="keyword">else</span> <span class="keyword">if</span> (父布局的mode == MeasureSpec.EXACTLY)&#123;</span><br><span class="line"></span><br><span class="line">        ... 同理 ...</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>View的Measure过程中遇到的问题，解决</strong></p>
+<p>View 的measure过程和Activity的生命周期方法不是同步执行的，因此无法保证Activity执行了onCreate、onStart、onResume时某个View已经测量完毕了。如果View还没有测量完毕，那么获得的宽和高都是0。</p>
+<p>在这⾥我举⼀个具体点的例⼦，可能不是⾮常的合理，但确实有助于理解：</p>
+<p><img src="C:/Users/admin019/AppData/Roaming/Typora/typora-user-images/image-20220707161117754.png" alt="image-20220707161117754"></p>
+<p>如图，在布局中你可能在外部设置了⼀个ScrollerView，并且设置为match_parent,然后它的内部的内容如虚线内所⽰，⽐屏幕的⾼度要长，那么这时候我们在measure过程中的到的测量⾼&#x2F;宽最⼤也只能为屏幕的⾼，⽽在layout过程中得到的实际宽&#x2F;⾼，确是⽐屏幕的⾼要长的。<br>当然⼤多数情况下，测量的宽&#x2F;⾼和最终实际的宽&#x2F;⾼是相同的，但是当遇到⼀些特殊情境时我们还是要多多⼩⼼。</p>
+<p><strong>这⾥给⼤家⼏个解决办法以供参考</strong>：<br>①ViewTreeObserver，视图树。</p>
+<p>使用 ViewTreeObserver 的众多回调方法可以完成这个功能，比如使用onGlobalLayoutListener 接口，当 View树的状态发生改变或者View树内部的View的可见性发生改变时，onGlobalLayout 方法将被回调。伴随着View树的变化，这个方法也会被多次调用。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">  @Override  </span><br><span class="line">  protected void onStart() &#123;  </span><br><span class="line">    super.onStart();  </span><br><span class="line">    ViewTreeObserver viewTreeObserver=view.getViewTreeObserver();  </span><br><span class="line">    viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() &#123;  </span><br><span class="line">        @Override  </span><br><span class="line">        public void onGlobalLayout() &#123;  </span><br><span class="line">            view.getViewTreeObserver().removeOnGlobalLayoutListener(this);  </span><br><span class="line">            int width=view.getMeasuredWidth();  </span><br><span class="line">            int height=view.getMeasuredHeight();  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;);  </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>②Activity&#x2F;View的onWindowsChanged()方法</p>
+<p>onWindowFocusChanged()表示 View 已经初始化完毕了，宽高已经准备好了，这个时候去获取是没问题的。这个方法会被调用多次，当Activity继续执行或者暂停执行的时候，这个方法都会被调用，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onWindowFocusChanged</span><span class="params">(<span class="type">boolean</span> hasWindowFocus)</span> &#123;</span><br><span class="line">       <span class="built_in">super</span>.onWindowFocusChanged(hasWindowFocus);</span><br><span class="line">     <span class="keyword">if</span>(hasWindowFocus)&#123;</span><br><span class="line">     <span class="type">int</span> width=view.getMeasuredWidth();</span><br><span class="line">     <span class="type">int</span> height=view.getMeasuredHeight();</span><br><span class="line">    &#125;      </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>③View.post(runnable)方法</p>
+<p>通过psot可以将⼀个runnable投递到消息队列的尾部，然后等待Looper调⽤此runnable的时候，View也已经初<br>始化好了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  </span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onStart</span><span class="params">()</span> &#123;  </span><br><span class="line">    <span class="built_in">super</span>.onStart();  </span><br><span class="line">    view.post(<span class="keyword">new</span> <span class="title class_">Runnable</span>() &#123;  </span><br><span class="line">        <span class="meta">@Override</span>  </span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;  </span><br><span class="line">            <span class="type">int</span> width=view.getMeasuredWidth();  </span><br><span class="line">            <span class="type">int</span> height=view.getMeasuredHeight();  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;);  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p>在这里你可以通过setMeasuredDimension()方法对子View的具体宽高以及测量模式进行指定。</p>
+<p><strong>view.post()和handler.post()：</strong></p>
+<p>**view.post()**：添加一个任务到view的任务队列mRunQueue中，在view的绘制流程performTraversals()方法中调用getRunQueue().executeActions(mAttachInfo.mHandler)执行，拿到mAttachInfo.mHandler，mAttachInfo是在主线程，所以view.post()添加的任务会在主线程中执行。（Android是handler队列中事件驱动的，view.post()任务会在view的测量布局之后执行）。</p>
+<p>**Handler.post()**：添加一个任务到队列，排队执行，最终执行的线程不一定是主线程，取决于looper创建的线程。</p>
+<h5 id="2-2-布局-layout"><a href="#2-2-布局-layout" class="headerlink" title="2.2  布局- layout"></a>2.2  布局- layout</h5><p>​	设置视图在屏幕中显示的位置，<strong>ViewGroup来确定子元素的位置</strong>，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public void layout(int l, int t, int r, int b)</span><br><span class="line">protected boolean setFrame(int left, int top, int right, int bottom)</span><br><span class="line">protected void onLayout(boolean changed, int left, int top, int right, int bottom)</span><br></pre></td></tr></table></figure>
+
+<p>layout通过调用setFrame（l,t,r,b），l,t,r,b即子视图在父视图中的具体位置，onLayout一般只会在自定义ViewGroup中才会使用。</p>
+<p>当 ViewGroup 的位置被确定后，在layout中会调用onLayout ，在onLayout中会遍历所有的子元素并调用子元素的 layout 方法。在代码中设置View的成员变量 mLeft，mTop，mRight，mBottom 的值，这几个值是在屏幕上构成矩形区域的四个坐标点，就是该View显示的位置，不过这里的具体位置都是相对与父视图的位置而言，而 onLayout 方法则会确定所有子元素位置，ViewGroup在onLayout函数中通过调用其children的layout函数来设置子视图相对与父视图中的位置，具体位置由函数 layout 的参数决定。其关键代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*  </span></span><br><span class="line"><span class="comment"> *@param l view 左边缘相对于父布局左边缘距离 </span></span><br><span class="line"><span class="comment"> *@param t view 上边缘相对于父布局上边缘位置 </span></span><br><span class="line"><span class="comment"> *@param r view 右边缘相对于父布局左边缘距离 </span></span><br><span class="line"><span class="comment"> *@param b view 下边缘相对于父布局上边缘距离 </span></span><br><span class="line"><span class="comment"> */</span>  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">layout</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> t, <span class="type">int</span> r, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">//记录 view 原始位置  </span></span><br><span class="line">        <span class="type">int</span> <span class="variable">oldL</span> <span class="operator">=</span> mLeft;</span><br><span class="line">        <span class="type">int</span> <span class="variable">oldT</span> <span class="operator">=</span> mTop;</span><br><span class="line">        <span class="type">int</span> <span class="variable">oldB</span> <span class="operator">=</span> mBottom;</span><br><span class="line">        <span class="type">int</span> <span class="variable">oldR</span> <span class="operator">=</span> mRight;</span><br><span class="line">        <span class="comment">//调用 setFrame 方法 设置新的 mLeft、mTop、mBottom、mRight 值，  </span></span><br><span class="line">        <span class="comment">//设置 View 本身四个顶点位置  </span></span><br><span class="line">        <span class="comment">//并返回 changed 用于判断 view 布局是否改变  </span></span><br><span class="line">        <span class="type">boolean</span> <span class="variable">changed</span> <span class="operator">=</span> isLayoutModeOptical(mParent) ?</span><br><span class="line">                setOpticalFrame(l, t, r, b) : setFrame(l, t, r, b);</span><br><span class="line">        <span class="comment">//第二步，如果 view 位置改变那么调用 onLayout 方法设置子 view 位置  </span></span><br><span class="line">        <span class="keyword">if</span> (changed || (mPrivateFlags &amp; PFLAG_LAYOUT_REQUIRED) == PFLAG_LAYOUT_REQUIRED) &#123;</span><br><span class="line">        <span class="comment">//调用 onLayout  </span></span><br><span class="line">            onLayout(changed, l, t, r, b);</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="2-3-绘制-draw"><a href="#2-3-绘制-draw" class="headerlink" title="2.3. 绘制- draw"></a>2.3. 绘制- draw</h5><p>​	作⽤：利用前两步得到的参数，将视图显示在屏幕上，到这里也就完成了整个的视图绘制工作</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//绘制视图通⽤的部分，确定绘制的流程，⼀般不会重写此⽅法;</span><br><span class="line">public void draw(Canvas canvas)</span><br><span class="line">//重写此⽅法,绘制⾃⼰需要的样⼦,⼀些具体的View类(如：TextView，ImageView)都重写了此⽅法;</span><br><span class="line">protected void onDraw(Canvas canvas)</span><br></pre></td></tr></table></figure>
+
+<p>通过调用draw函数进行视图绘制，在View类中onDraw函数是个空函数，最终的绘制需求需要在自定义的onDraw函数中进行实现，比如ImageView完成图片的绘制，如果自定义ViewGroup这个函数则不需要重载。</p>
+<h5 id="2-4-视图重绘"><a href="#2-4-视图重绘" class="headerlink" title="2.4 . 视图重绘"></a>2.4 . 视图重绘</h5><pre><code>   1、**requestLayout**：重新绘制视图子View调用requestLayout方法，会标记当前View及父容 			器，同时逐层向上提交，直到ViewRootImpl处理该事件，ViewRootImpl会调用三大流程，			measure开始，对于每一个含有标记位的view及其子View都会进行测量、布局、绘制。
+</code></pre>
+<p>​		2、<strong>invalidate</strong>：在UI线程中重新绘制视图当子View调用了invalidate方法后，会为该View添加一			个标记位，同时不断向父容器请求刷新，父容器通过计算得出自身需要重绘的区域，直到传递			到ViewRootImpl中，最终触发performTraversals方法，进行开始View树重绘流程(只绘制需要			重绘的视图)。</p>
+<p>​		3、<strong>postInvalidate</strong>：在非UI线程中重新绘制视图这个方法与invalidate方法的作用是一样的，都			是使View树重绘，但两者的使用条件不同，postInvalidate是在非UI线程中调用，invalidate则			是在UI线程中调用。</p>
+<p>​		<strong>总结</strong>：一般来说，如果View确定自身不再适合当前区域，比如说它的LayoutParams发生了				改变，需要父布局对其进行重新<strong>测量、摆放、绘制</strong>这三个流程，往往使用requestLayout。				invalidate则是刷新当前View，使当前View进行重绘，不会进行测量、布局流程，因此如果				View只需要重绘而不需要测量，布局的时候，使用invalidate方法往往比requestLayout方法				更高效。</p>
+<p><strong>View的绘制流程：</strong></p>
+<p>performResumeActivity()   —&gt;   windowManager.addView()  —&gt;  windowManagerImpl中addView()  —&gt;   mGlobal.addView()  —&gt;   viewRootImpl.setView()  —&gt;   requestLayout()  —&gt;   scheduleTraversals()  —&gt;   TraversalRunnable的回调中doTraversal()  —&gt;  performTraversals()</p>
+<p>在performTraversals()中执行performMeasure()、performLayout()、performDraw()，并且回调getRunQueue().executeActions(mAttachInfo.mHandler);</p>
+<p>在Activity的onResume生命周期执行完毕后，获取windowManager对象调用addView()将decorView添加到ViewRootImpl中，在WindowManagerGlobal中创建viewRootImpl调用setView()，然后依次调用requestLayout()，scheduleTraversals()，doTraversal()，performTraversals()，然后一次执行performMeasure()、performLayout()、performDraw()完成View的绘制。</p>
+<h4 id="3-销毁"><a href="#3-销毁" class="headerlink" title="3.销毁"></a>3.销毁</h4><p>​	什么时候死亡消耗：<br>​		1.Activity死亡之前<br>​		2.视图对象被移除<br>​    流程⽅法 :onDetachedFromWindow()</p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/af266ff378c6">view工作流程，以及源码</a></p>
+<h3 id="四、事件处理"><a href="#四、事件处理" class="headerlink" title="四、事件处理"></a>四、事件处理</h3><h4 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h4><p>android事件处理，最复杂的就是对Touch事件的处理，因为Touch事件包括：down, move, up, cancle和多点触摸等多种情况。需要了解view的事件机制。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">void dispatchTouchEvent(MotionEvent ev);　　(Activity, ViewGroup, View都有此方法)</span><br><span class="line">//分发事件,从外向⾥⼀层⼀层分发, 分发到事件发⽣的最⾥⾯的视图对象 </span><br><span class="line"></span><br><span class="line">boolean onInterceptTouchEvent(MotionEvent ev);　(只有ViewGroup有)</span><br><span class="line">//拦截请求, 只有return true才拦截成功,如果事件被拦截,事件不会再向内层分发, 交给当前的视图处理 </span><br><span class="line"></span><br><span class="line">boolean  onTouchEvent(MotionEvent);　　　　　　(Activity, ViewGroup, View都有此方法) </span><br><span class="line">//处理事件:消费事件的条件: return true </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-事件机制："><a href="#2-事件机制：" class="headerlink" title="2. 事件机制："></a>2. <strong>事件机制：</strong></h4><p>​	①分发： 将TouchEvent对象从Activity对象开始, 由外向内分发给对应的布局和⼦View对象（由外向内分发）。<br>​	②处理： 回调OnTouchListener的boolean onTouch(), 回调View的boolean onTouchEvent()<br>​	③消费： 回调⽅法返回true<br>​	④拦截： onInterceptTouchEvent()执⾏返回true ,如果返回true, TouchEvent就不会再传⼊⼦View对象<br>​	⑤反拦截： <strong>view.getParent().requestDisallowInterceptTouchEvent(true)</strong> ,使⽗View不能再拦截, 事件就会分发到当前View对象   拦截与反拦截，都是在分发的时候就要决定的。</p>
+<p>事件的分发，过滤（拦截）是从根到叶的，处理则是从叶再到根的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">View的事件分发：</span><br><span class="line">1、  触摸事件的传递流程是从dispatchTouchEvent开始的，如果不进行人为干预（super.dispatchTouchEvent()），则事件会按照嵌套层次从外层依次向内层传递，到达最内层View时，就由它的TouchEvent方法处理。该方法如果能消费此事件，则返回true，如果处理不了，则返回false，这时事件会重新向外层传递，并由外层view的touchevetnt方法进行处理，以此类推。如果进行人为干预，无论返回true或false，都不再向下传递。</span><br><span class="line"></span><br><span class="line">2、  如果事件在向内层传递过程中进行人为干预，处理函数返回true，则会导致事件提前被消费掉，内层view将不会收到此事件</span><br><span class="line">3、  View控件的事件触发顺序是先执行onTouch方法，在最后才执行onClick方法。如果OnTouch返回true，则事件不会继续传递，最后也不会调用onclick方法，如果onTouch返回false，则事件继续传递。</span><br></pre></td></tr></table></figure>
+
+<p>生活案例：</p>
+<p>Android中的事件拦截机制，其实跟我们生活中的上下级委托任务很像，领导可以处理掉，也可以下发给下属员工处理，如果员工处理的好，领导才敢给你下发任务，如果你处理不好，则领导也不敢把任务交给你，这就像在中途把下发的任务的中途拦截掉了。通过流程和源码的分析，相信大家能比较容易了解事件的分发、拦截、处理事件的流程。</p>
+<h4 id="3-滑动冲突"><a href="#3-滑动冲突" class="headerlink" title="3.滑动冲突"></a>3.滑动冲突</h4><h5 id="一-滑动冲突场景以及产生原因"><a href="#一-滑动冲突场景以及产生原因" class="headerlink" title="一.  滑动冲突场景以及产生原因"></a>一.  滑动冲突场景以及产生原因</h5><p>产生滑动冲突的场景主要有两种:</p>
+<ul>
+<li>父ViewGroup和子View的滑动方向一致</li>
+<li>父ViewGroup和子View的滑动方向不一致</li>
+</ul>
+<h5 id="二-滑动冲突的解决方式"><a href="#二-滑动冲突的解决方式" class="headerlink" title="二.  滑动冲突的解决方式"></a>二.  滑动冲突的解决方式</h5><p>滑动冲突主要有两种解决方式：外部拦截法和内部拦截法</p>
+<h6 id="1、外部拦截法-（子view代码无需修改）（符合view事件分发机制）"><a href="#1、外部拦截法-（子view代码无需修改）（符合view事件分发机制）" class="headerlink" title="1、外部拦截法 （子view代码无需修改）（符合view事件分发机制）"></a><strong>1、外部拦截法 （子view代码无需修改）（符合view事件分发机制）</strong></h6><p><strong>通用模板：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">    public boolean onInterceptTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">        boolean intercepted =false;</span><br><span class="line">        int x = (int) ev.getX();</span><br><span class="line">        int y = (int) ev.getY();</span><br><span class="line">        switch (ev.getAction())&#123;</span><br><span class="line">            case MotionEvent.ACTION_DOWN:</span><br><span class="line">            //DOWN事件不能拦截，否则事件将无法分发到子View</span><br><span class="line">                intercepted = false;</span><br><span class="line">                break;</span><br><span class="line">            case MotionEvent.ACTION_MOVE:</span><br><span class="line">                 //根据条件判断是否拦截事件</span><br><span class="line">              isIntercept = needThisEvent();</span><br><span class="line">                break;</span><br><span class="line">            case MotionEvent.ACTION_UP:</span><br><span class="line">              //一旦父容器拦截了UP事件，子View将无法触发点击事件</span><br><span class="line">                intercepted = false;</span><br><span class="line">                break;</span><br><span class="line">            default:</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">        mLastXintercept = x;</span><br><span class="line">        mLastYintercept = y;</span><br><span class="line">        return intercepted;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结：</strong></p>
+<ul>
+<li>外部拦截法主要是父容器去控制事件的拦截，根据业务需要，若事件是父容器需要的，则进行拦截，不需要的则向下传递。</li>
+<li>父容器不能拦截DOWN事件或者UP事件。</li>
+</ul>
+<p><strong>案例</strong>：<strong>解决横向滑动冲突问题。</strong></p>
+<p>ViewPager处理事件的条件可以有多种方法，例如水平方向和竖直方向上的滑动速度、水平方向和竖直方向的滑动距离等。这边根据滑动距离判断，当水平方向的滑动距离大于竖直方向的滑动距离，则ViewPager处理事件，反之则将事件传递给ListView。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">public class MyViewPager extends ViewPager &#123;</span><br><span class="line">    private int mLastX;</span><br><span class="line">    private int mLastY;</span><br><span class="line"></span><br><span class="line">    public MyViewPager(@NonNull Context context) &#123;</span><br><span class="line">        super(context);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    public MyViewPager(@NonNull Context context, @Nullable AttributeSet attrs) &#123;</span><br><span class="line">        super(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    @Override</span><br><span class="line">    public boolean onInterceptTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">        //一些ViewPager拖拽的标志位要设置，必调super，否则看不到效果</span><br><span class="line">        super.onInterceptTouchEvent(ev);</span><br><span class="line">     </span><br><span class="line">        boolean isIntercepted = false;</span><br><span class="line">        switch (ev.getAction()) &#123;</span><br><span class="line">            case MotionEvent.ACTION_DOWN:</span><br><span class="line">                break;</span><br><span class="line">            case MotionEvent.ACTION_MOVE:</span><br><span class="line">                if (needEvent(ev)) &#123;</span><br><span class="line">                    isIntercepted = true;</span><br><span class="line">                &#125;</span><br><span class="line">                break;</span><br><span class="line">            default:</span><br><span class="line">        &#125;</span><br><span class="line">        mLastX = (int) ev.getX();</span><br><span class="line">        mLastY = (int) ev.getY();</span><br><span class="line">     </span><br><span class="line">        LogUtils.d(&quot; lastX = &quot; + mLastX + &quot; lastY = &quot; + mLastY);</span><br><span class="line">        return isIntercepted;</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    private boolean needEvent(MotionEvent ev) &#123;</span><br><span class="line">        //水平滚动距离大于垂直滚动距离则将事件交由ViewPager处理</span><br><span class="line">        return Math.abs(ev.getX() - mLastX) &gt; Math.abs(ev.getY() - mLastY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>效果图</strong>：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/0b3c8d36be76826212ecd14749d7e9f8.gif" alt="img"></p>
+<h6 id="2、内部拦截法（父viewgroup需要重写onInterceptTouchEvent）（不符合view事件分发机制）"><a href="#2、内部拦截法（父viewgroup需要重写onInterceptTouchEvent）（不符合view事件分发机制）" class="headerlink" title="2、内部拦截法（父viewgroup需要重写onInterceptTouchEvent）（不符合view事件分发机制）"></a><strong>2、内部拦截法（父viewgroup需要重写onInterceptTouchEvent）（不符合view事件分发机制）</strong></h6><p><strong>通用模板</strong></p>
+<p>子View伪代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">//代码： 需要注意，要确保MotionEvent.ACTION_DOWN时不拦截</span><br><span class="line">public boolean dispatchTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">  int y= (int) ev.getY();</span><br><span class="line">    switch (ev.getAction())&#123;</span><br><span class="line">        case MotionEvent.ACTION_DOWN:</span><br><span class="line">            getParent().requestDisallowInterceptTouchEvent(true);</span><br><span class="line">            yDown=y;</span><br><span class="line">            break;</span><br><span class="line">        case MotionEvent.ACTION_MOVE:</span><br><span class="line">            yMove=y;</span><br><span class="line">            int scrollY = getScrollY();</span><br><span class="line">             //根据业务需求判断是否需要通知父viewgroup来拦截处理该事件</span><br><span class="line">              if (scrollY == 0&amp;&amp;yMove-yDown&gt;0) &#123;   </span><br><span class="line">                //允许父View进行事件拦截</span><br><span class="line">                Log.e(&quot;mes&quot;,yMove-yDown+&quot;拦截&quot;);</span><br><span class="line">                getParent().requestDisallowInterceptTouchEvent(false);</span><br><span class="line">            &#125;            </span><br><span class="line">            break;</span><br><span class="line">        case MotionEvent.ACTION_UP:</span><br><span class="line">            break;</span><br><span class="line">    &#125;</span><br><span class="line">    return super.dispatchTouchEvent(ev);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>父ViewGroup 伪代码  </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public boolean onInterceptTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">    int action = ev.getAction();</span><br><span class="line">    if(action == MotionEvent.ACTION_DOWN)&#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>总结</strong></p>
+<ul>
+<li><p>内部拦截法是将事件控制权交给子View，若子View需要事件，则对事件进行处理，不需要则将事件传递给父ViewGroup，让父ViewGroup处理。</p>
+</li>
+<li><p>子View通过调用父ViewGroup的requestDisallowInterceptTouchEvent来干预父ViewGroup对事件的拦截状况</p>
+</li>
+<li><p>父ViewGroup不能拦截DOWN事件，至于MOVE或者UP事件的拦截状态要根据具体的情景</p>
+</li>
+</ul>
+<p><strong>案例：</strong></p>
+<p>ScrollView内部的内部的LinearLayout存在三个子View，从上到下分别为ImageView、ListView以及TextView。</p>
+<p>需要的效果需求：</p>
+<p>ScrollView的滑动不受限制。当触摸ListView区域时，存在多种情况。当ListView滚动到顶部时(ListView处于初始状态)，此时若手指往下滑动，则ScrollView往下滑动；当ListView滚动到底部时，若此时手指往上滑动，则ScrollView往上滑动，其余情况下ListView滚动。</p>
+<img src="https://img-blog.csdnimg.cn/img_convert/b3f9a1c6f01d62332e460077a5c9b8c4.png" alt="同向滑动冲突场景" style="zoom: 80%;" />
+
+<p>效果如下图：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/baab33c9d30f0abe665b18c602010832.gif" alt="img"></p>
+<p>具体实现：</p>
+<p>我们需要监听ListView滚动到顶部和底部的状态，当ListView滚动到顶部时且手指触摸方向向下或者ListView滚动到底部且手机触摸方向向上，则将事件交由ScrollView处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">public class MyListView extends ListView implements AbsListView.OnScrollListener &#123;</span><br><span class="line"></span><br><span class="line">    private boolean isScrollToTop;</span><br><span class="line">    private boolean isScrollToBottom;</span><br><span class="line">     </span><br><span class="line">    private int mLastX;</span><br><span class="line">    private int mLastY;</span><br><span class="line">     </span><br><span class="line">    public MyListView(Context context) &#123;</span><br><span class="line">        this(context, null);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    public MyListView(Context context, AttributeSet attrs) &#123;</span><br><span class="line">        this(context, attrs, -1);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    public MyListView(Context context, AttributeSet attrs, int defStyleAttr) &#123;</span><br><span class="line">        super(context, attrs, defStyleAttr);</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    private void init() &#123;</span><br><span class="line">        setOnScrollListener(this);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    @Override</span><br><span class="line">    public boolean dispatchTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">        LogUtils.d(&quot;&quot; + Constants.getActionName(ev.getAction()));</span><br><span class="line">        switch (ev.getAction()) &#123;</span><br><span class="line">            case MotionEvent.ACTION_DOWN:</span><br><span class="line">                getParent().requestDisallowInterceptTouchEvent(true);</span><br><span class="line">                mLastX = (int) ev.getX();</span><br><span class="line">                mLastY = (int) ev.getY();</span><br><span class="line">                break;</span><br><span class="line">            case MotionEvent.ACTION_MOVE:</span><br><span class="line">                if (superDispatchMoveEvent(ev)) &#123;</span><br><span class="line">                    getParent().requestDisallowInterceptTouchEvent(false);</span><br><span class="line">                &#125;</span><br><span class="line">                break;</span><br><span class="line">            case MotionEvent.ACTION_UP:</span><br><span class="line">                LogUtils.d(&quot;ACTION_UP&quot;);</span><br><span class="line">                break;</span><br><span class="line">            default:</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">        return super.dispatchTouchEvent(ev);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    /**</span><br><span class="line">     * 将事件交由父容器处理</span><br><span class="line">     *</span><br><span class="line">     * @param ev</span><br><span class="line">     * @return</span><br><span class="line">     */</span><br><span class="line">    private boolean superDispatchMoveEvent(MotionEvent ev) &#123;</span><br><span class="line">        //下滑</span><br><span class="line">        boolean canScrollBottom = isScrollToTop &amp;&amp; (ev.getY() - mLastY) &gt; 0;</span><br><span class="line">        boolean canScrollTop = isScrollToBottom &amp;&amp; (ev.getY() - mLastY) &lt; 0;</span><br><span class="line">     </span><br><span class="line">        return canScrollBottom || canScrollTop;</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    @Override</span><br><span class="line">    public void onScrollStateChanged(AbsListView view, int scrollState) &#123;</span><br><span class="line">     </span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    @Override</span><br><span class="line">    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) &#123;</span><br><span class="line">        isScrollToBottom = false;</span><br><span class="line">        isScrollToTop = false;</span><br><span class="line">     </span><br><span class="line">        if (firstVisibleItem == 0) &#123;</span><br><span class="line">            android.view.View firstVisibleItemView = getChildAt(0);</span><br><span class="line">            if (firstVisibleItemView != null &amp;&amp; firstVisibleItemView.getTop() == 0) &#123;</span><br><span class="line">                LogUtils.d(&quot;##### 滚动到顶部 ######&quot;);</span><br><span class="line">                isScrollToTop = true;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">        if ((firstVisibleItem + visibleItemCount) == totalItemCount) &#123;</span><br><span class="line">            View lastVisibleItemView = getChildAt(getChildCount() - 1);</span><br><span class="line">            if (lastVisibleItemView != null &amp;&amp; lastVisibleItemView.getBottom() == getHeight()) &#123;</span><br><span class="line">                LogUtils.d(&quot;##### 滚动到底部 ######&quot;);</span><br><span class="line">                isScrollToBottom = true;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ScrollView，默认在拖拽状态下会拦截MOVE事件，默认不拦截UP事件，若需要拦截UP事件，可重写ScrollView的onInterceptTouchEvent方法，但不是必须拦截UP事件，若父ViewGroup不需要触发单击事件，则可以不拦截；</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class MyScrollView extends ScrollView &#123;</span><br><span class="line">    public MyScrollView(Context context) &#123;</span><br><span class="line">        super(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public MyScrollView(Context context, AttributeSet attrs) &#123;</span><br><span class="line">        super(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    public MyScrollView(Context context, AttributeSet attrs, int defStyleAttr) &#123;</span><br><span class="line">        super(context, attrs, defStyleAttr);</span><br><span class="line">    &#125;</span><br><span class="line">     </span><br><span class="line">    @Override</span><br><span class="line">    public boolean onInterceptTouchEvent(MotionEvent ev) &#123;</span><br><span class="line">        boolean intercepted  = super.onInterceptTouchEvent(ev);</span><br><span class="line">        if (ev.getAction() == MotionEvent.ACTION_UP) &#123;</span><br><span class="line">            intercepted = true;</span><br><span class="line">        &#125;</span><br><span class="line">        return intercepted;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其它滑动冲突解决案例：<a target="_blank" rel="noopener" href="https://www.jb51.net/article/90032.htm">https://www.jb51.net/article/90032.htm</a></p>
+<h3 id="五、其它问题"><a href="#五、其它问题" class="headerlink" title="五、其它问题"></a>五、其它问题</h3><h4 id="1-在Android中区分点击和滑动操作"><a href="#1-在Android中区分点击和滑动操作" class="headerlink" title="1.在Android中区分点击和滑动操作"></a>1.在Android中区分点击和滑动操作</h4><p>对View进行绑定Touch事件的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E7%9B%91%E5%90%AC&spm=1001.2101.3001.7020">监听</a>(android.view.View.OnTouchListener)进行处理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">   private static float DownX = 0;</span><br><span class="line">   private static float DownY = 0;</span><br><span class="line">   private static float moveX = 0;</span><br><span class="line">   private static float moveY = 0;</span><br><span class="line">   private static long currentMS = 0;</span><br><span class="line"></span><br><span class="line">  。。。。。。</span><br><span class="line"></span><br><span class="line">mContentView.setOnTouchListener(new View.OnTouchListener() &#123;</span><br><span class="line">       @Override</span><br><span class="line">       public boolean onTouch(View v, MotionEvent event) &#123;</span><br><span class="line">           switch (event.getAction()) &#123;</span><br><span class="line">               case MotionEvent.ACTION_DOWN:</span><br><span class="line">                   DownX = event.getX();//float DownX</span><br><span class="line">                   DownY = event.getY();//float DownY</span><br><span class="line">                   moveX = 0;</span><br><span class="line">                   moveY = 0;</span><br><span class="line">                   currentMS = System.currentTimeMillis();//long currentMS     获取系统时间</span><br><span class="line">                   break;</span><br><span class="line">               case MotionEvent.ACTION_MOVE:</span><br><span class="line">                   moveX += Math.abs(event.getX() - DownX);//X轴距离</span><br><span class="line">                   moveY += Math.abs(event.getY() - DownY);//y轴距离</span><br><span class="line">                   DownX = event.getX();</span><br><span class="line">                   DownY = event.getY();</span><br><span class="line">                   break;</span><br><span class="line">               case MotionEvent.ACTION_UP:</span><br><span class="line">                   long moveTime = System.currentTimeMillis() - currentMS;//移动时间</span><br><span class="line">                   //判断是否继续传递信号</span><br><span class="line">                   if(moveTime&gt;200&amp;&amp;(moveX&gt;20||moveY&gt;20))&#123;</span><br><span class="line">                       return true; //不再执行后面的事件，在这句前可写要执行的触摸相关代码。点击事件是发生在触摸弹起后</span><br><span class="line">                   &#125;</span><br><span class="line">                   break;</span><br><span class="line">           &#125;</span><br><span class="line">           return false;//继续执行后面的代码</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-scrollTo-scrollBy-区别"><a href="#2-scrollTo-scrollBy-区别" class="headerlink" title="2. scrollTo | scrollBy 区别"></a>2. scrollTo | scrollBy 区别</h4><blockquote>
+<p>这两个函数都是在<code>View.java</code>中，所以这两个都可以对View视图进行滚动。<br>阅读这两个函数的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%BA%90%E7%A0%81&spm=1001.2101.3001.7020">源码</a>就可以找出它们的区别了</p>
+</blockquote>
+<img src="https://img-blog.csdn.net/20171226212107695?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvYV96aG9u/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" style="zoom: 50%;" />
+
+<ul>
+<li>可以发现<code>scrollBy()</code>最终调用的还是<code>scrollTo()</code>，只是对参数进行了改变；<code>mScrollX、mScrollY</code>代表的就是View x、y轴当前滑动的距离。</li>
+</ul>
+<p><strong>scrollTo（int x,int y）：</strong></p>
+<p>将View滚动到指定的一个位置A(x,y)</p>
+<p>如果偏移位置发生了改变，就会给mScrollX和mScrollY赋新值，改变当前位置。</p>
+<p>注意：x,y代表的不是坐标点，而是偏移量。</p>
+<p>例如：我要移动view到坐标点（100，100），那么我的偏移量就是(0,，0) - （100，100） &#x3D; （-100 ，-100） ，我就要执行view.scrollTo(-100,-100),达到这个效果。</p>
+<p><strong>scrollBy（int x,int y）：</strong></p>
+<p><strong>简单说：是将View从上次滚动的位置 继续滚动</strong></p>
+<p>从源码中看出，它实际上是调用了scrollTo(mScrollX + x, mScrollY + y);</p>
+<p>mScrollX + x和mScrollY + y，即表示在原先偏移的基础上在发生偏移，通俗的说就是相对我们当前位置偏移。</p>
+<p>根据父类VIEW里面移动，如果移动到了超出的地方，就不会显示。查看上文中的示意图你就会知道大概。</p>
+<p>效果图：</p>
+<img src="https://img-blog.csdn.net/20140427161525687?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdmlwemp5bm8x/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="img" style="zoom:67%;" />
+
+
+
+<p>使用scrollTo、scrollBy来滑动View的时候是很生硬得滑过去的，不够平滑，自然用户体验也不好，因此我们要实现一个弹性的滑动。如何实现弹性滑动呢？方法有很多，但思想都是一致的，即将实现一段距离的滑动分成多次来进行，每一次滑动一小段，渐近式的滑动。一般嵌套一个外层，滚动外层即可。</p>
+<h4 id="3-Scroller："><a href="#3-Scroller：" class="headerlink" title="3.Scroller："></a>3.<strong>Scroller：</strong></h4><p>这个类封装了滚动操作，你可以根据你的手势对界面进行更加平滑的滚动操作。提供了拖动效果的类，开发文档参考链接：<a target="_blank" rel="noopener" href="http://developer.android.com/reference/android/widget/Scroller.html">http://developer.android.com/reference/android/widget/Scroller.html</a></p>
+<p><strong>computeScrollOffset</strong></p>
+<p><strong>跟踪变化的x &#x2F; y坐标的位置</strong>, 通过computeScrollOffset()方法监听返回的布尔值来指示滚动动作是否完成。如果返回为false,说明滚动已经结束。返回true,它意味着操作仍在进行中。您可以使用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">int currX = mScroller.getCurrX();  *//*滚动的*X*滚动距离</span><br><span class="line"></span><br><span class="line">int currY = mScroller.getCurrY();   *//*滚动的*y*滚动距离</span><br><span class="line"></span><br><span class="line">这个方法来找到当前的x和y坐标的偏移量。</span><br></pre></td></tr></table></figure>
+
+<p><strong>computeScroll</strong></p>
+<p>知道了computeScrollOffset()这个判断是否滚动的方法，那我们必须要有监听滑屏控制，并且重绘，在<a target="_blank" rel="noopener" href="http://lib.csdn.net/base/android">android</a>框架中的VIEW类中就提供了computeScroll(）这个方法去控制该流程。在绘制View时，会在draw()过程调用该方法。因此， 再配合使用Scroller实例，我们就可以获得当前应该的偏移坐标，手动使View&#x2F;ViewGroup偏移至该处。</p>
+<p><strong><em>*注：在使用Scroller这个类**实现偏移控制，一般自定义View&#x2F;ViewGroup都需要重载该方法**</em>*</strong> </p>
+<p>具体实现：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override </span><br><span class="line">  public void computeScroll() &#123; </span><br><span class="line">    if (mScroller.computeScrollOffset()) &#123; </span><br><span class="line">      scrollTo(mScroller.getCurrX(), mScroller.getCurrY()); </span><br><span class="line">      // 更新界面 </span><br><span class="line">     postInvalidate(); </span><br><span class="line">      isMoving = true; </span><br><span class="line">    &#125; else &#123; </span><br><span class="line"></span><br><span class="line">      isMoving = false; </span><br><span class="line">    &#125; </span><br><span class="line">    super.computeScroll(); </span><br><span class="line">  &#125; </span><br></pre></td></tr></table></figure>
+
+<p><strong>startScroll()</strong></p>
+<p>该方法以提供的起始点和将要滑动的距离开始滚动，我们可以使用该方法达到自动滚动的效果。在滚动中，如果符合什么条件，可以调用该方法让它滚动到相对应的地方。</p>
+<p><strong>Scroller使用思路流程：</strong></p>
+<p>1.可以在自定义的布局中，按照需求初始化Scroller构造函数。</p>
+<p>2.重写onInterceptTouchEvent(MotionEvent ev)方法，看看是否要拦截相关的点击时间。</p>
+<p>3.重写onTouchEvent(MotionEvent event)方法，根据触摸屏上的动作使用computeScroll(）以及scrollTo 和 scrollBy 方法进行根据手指对布局进行滑动效果。</p>
+<p>4.在触摸操作结束（MotionEvent.ACTION_UP）的时候，调用startScroll(int startX, int startY, int dx, int dy, int duration)方法，进行动画自动操作，来完成整个滚动流程。</p>
+<p><strong>实例</strong>看看Scroller是如何实现平滑滑动</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">public class SmoothScrollView extends LinearLayout&#123;</span><br><span class="line"></span><br><span class="line">	Scroller mScroller ;</span><br><span class="line">	int startX;</span><br><span class="line">	int startY;</span><br><span class="line"></span><br><span class="line">public SmoothScrollView(Context context, AttributeSet attrs) &#123;</span><br><span class="line">	super(context, attrs);</span><br><span class="line">	//创建Scroller实例</span><br><span class="line">	mScroller = new Scroller(context);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public void smoothScroll(int dx,int dy,int duration)&#123;</span><br><span class="line">	//获取滑动起点坐标</span><br><span class="line">	startX = getScrollX();</span><br><span class="line">	startY = getScrollY();</span><br><span class="line">	//设置滑动参数</span><br><span class="line">	mScroller.startScroll(startX,startY,dx,dy,duration);</span><br><span class="line">	//重新绘制View</span><br><span class="line">	invalidate();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public void computeScroll() &#123;</span><br><span class="line">	// TODO Auto-generated method stub</span><br><span class="line">	super.computeScroll();</span><br><span class="line">	boolean flag = mScroller.computeScrollOffset();</span><br><span class="line">	//递归终止条件:滑动结束</span><br><span class="line">	if(flag == false)&#123;</span><br><span class="line">		return;</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">	//mScroller.getCurrX(),mScroller.getCurrY()记录的是此刻要滑动达到的目标坐标</span><br><span class="line">	scrollTo(mScroller.getCurrX(),mScroller.getCurrY());</span><br><span class="line">	&#125;</span><br><span class="line">	//递归调用</span><br><span class="line">	invalidate();//或者postInvalidate()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>到第9行，首先在SmoothScrollView 内部创建一个Scroller对象，第13行的smoothScroll方法是实现SmoothScrollView的平滑滑动，可以看到实现平滑滑动首先调用第18行Scroller的startScroll方法来设置滑动参数，下文会分析这个方法，这里先放一放。然后在第20行调用invalidate方法，这个方法会导致SmoothScrollView重绘，从而调用draw方法之后又会调用computeScroll方法，在第24行可以看到这里重写了computeScroll方法，因此调用invalidate方法最终会导致computeScroll方法被调用。第27~29行调用Scroller的computeScrollOffeset方法并判断是否滑动结束，computeScrollOffset是如何判断滑动结束的呢？这里也先放一放下文在分析。如果滑动未结束，执行第33行调用scrollTo滑动SmoothScrollView至此刻目的坐标，然后递归调用invalidate方法。</p>
+</blockquote>
+<p>实际上正真让SmoothScrollView 产生平滑滑动的并非是Scroller而是 SmoothScrollView 自己，是 SmoothScrollView 自己多次调用了自己的scrollerTo 方法并且每次滑动一小步从而实现平滑滑动，而 Scroller 类干的事只是辅助 SmoothScrollView 计算每一次小滑动要到达的目标坐标，而实现多次调用了自己的scrollerTo方法这里没有使用循环体则是利用程序设计技巧“递归调用”invalidate方法达到多次调用scrollTo方法的目的从而实现平滑滑动。</p>
+<h4 id="4-android中的⾓度和弧度"><a href="#4-android中的⾓度和弧度" class="headerlink" title="4.android中的⾓度和弧度"></a>4.android中的⾓度和弧度</h4><p>1、什么讲这个？<br>在我们⾃定义View，尤其是制作⼀些复杂炫酷的效果的时候，实际上是将⼀些简单的东西通过数学上精密的计算组合到⼀起形成的效果。<br>这其中可能会涉及到画布的相关操作(旋转)，以及⼀些正余弦函数的计算等，这些内容就会⽤到⼀些⾓度、弧度相关的知识。</p>
+<p>2、为什么对⾓的描述存在⾓度与弧度两种单位？<br>简单来说就是为了⽅便，为了精确描述⼀个⾓的⼤⼩引⼊了⾓度与弧度的概念。<br>由于两者进制是不同的(⾓度是60进制，弧度是10进制),在合适的地⽅使⽤合适的单位来描述会更加⽅便。</p>
+<blockquote>
+<p>例如： ⾓度是60进位制，遇到30°6′这样的⾓，应该转化为10进制的30.1°。但弧度就不需要，因为弧度本⾝就是⼗进制的实数。</p>
+</blockquote>
+<p>3、⾓度与弧度的定义<br>⾓度和弧度⼀样都是描述⾓的⼀种度量单位，下⾯是它们的定义：<br>⾓度<br>两条射线从圆⼼向圆周射出，形成⼀个夹⾓和夹⾓正对的⼀段弧。当这段弧长正好等于圆周长的360分之⼀时，两条射线的夹⾓的⼤⼩为1度.<br>弧度<br>两条射线从圆⼼向圆周射出，形成⼀个夹⾓和夹⾓正对的⼀段弧。当这段弧长正好等于圆的半径时，两条射线的夹⾓⼤⼩为1弧度</p>
+<p><img src="C:/Users/admin019/AppData/Roaming/Typora/typora-user-images/image-20220708111542388.png" alt="image-20220708111542388"></p>
+<p>4.⾓度和弧度的换算关系</p>
+<p>圆⼀周对应的⾓度为360度(⾓度)，对应的弧度为2π弧度。<br>故得等价关系:360(⾓度) &#x3D; 2π(弧度) &#x3D;&#x3D;&gt; 180(⾓度) &#x3D; π(弧度)<br>由等价关系可得如下换算公式:</p>
+<blockquote>
+<p>rad 是弧度， deg 是⾓度</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>公式</th>
+<th>例⼦</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>rad &#x3D; deg x π &#x2F; 180</td>
+<td>2π ＝ 360 x π &#x2F; 180</td>
+</tr>
+<tr>
+<td>deg &#x3D; rad x 180 &#x2F; π</td>
+<td>360 ＝ 2π x 180 &#x2F; π</td>
+</tr>
+</tbody></table>
+<p>​              </p>
+<h4 id="5、颜⾊"><a href="#5、颜⾊" class="headerlink" title="5、颜⾊"></a>5、颜⾊</h4><p>简要介绍安卓中的颜⾊相关内容，包括颜⾊的定义，创建颜⾊的⼏种⽅式等。</p>
+<p>1、简单介绍颜⾊</p>
+<p>安卓⽀持的颜⾊模式：</p>
+<p><img src="C:/Users/admin019/AppData/Roaming/Typora/typora-user-images/image-20220708112003383.png" alt="image-20220708112003383"></p>
+<p>PS：其中字母表⽰通道类型，数值表⽰该类型⽤多少位⼆进制来描述。如ARGB8888则表⽰有四个通道(ARGB),每个对应的通道均⽤8位<br>来描述。<br>注意：我们常⽤的是ARGB8888和ARGB4444，⽽在所有的安卓设备屏幕上默认的模式都是RGB565,请留意这⼀点。<br>以ARGB8888为例介绍颜⾊定义</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>解释</th>
+<th>0(0x00)</th>
+<th>255(0xff)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A(Alpha)</td>
+<td>透明度</td>
+<td>透明</td>
+<td>不透明</td>
+</tr>
+<tr>
+<td>R(Red)</td>
+<td>红⾊</td>
+<td>⽆⾊</td>
+<td>红⾊</td>
+</tr>
+<tr>
+<td>G(Green)</td>
+<td>绿⾊</td>
+<td>⽆⾊</td>
+<td>绿⾊</td>
+</tr>
+<tr>
+<td>B(Blue)</td>
+<td>蓝⾊</td>
+<td>⽆⾊</td>
+<td>蓝⾊</td>
+</tr>
+</tbody></table>
+<p>其中 A R G B 的取值范围均为0<del>255(即16进制的0x00</del>0xff)<br>A 从ox00到oxff表⽰从透明到不透明。<br>RGB 从0x00到0xff表⽰颜⾊从浅到深。<br>当RGB全取最⼩值(0或0x000000)时颜⾊为⿊⾊，全取最⼤值(255或0xffffff)时颜⾊为⽩⾊</p>
+<p>2、⼏种创建或使⽤颜⾊的⽅式</p>
+<p>2.1、java中定义颜⾊<br>int color &#x3D; Color.GRAY;     &#x2F;&#x2F;灰⾊</p>
+<p>由于Color类提供的颜⾊仅为有限的⼏个，通常还是⽤ARGB值进⾏表⽰。</p>
+<blockquote>
+<p>int color &#x3D; Color.argb(127, 255, 0, 0);   &#x2F;&#x2F;半透明红⾊<br>int color &#x3D; 0xaaff0000; &#x2F;&#x2F;带有透明度的红⾊</p>
+</blockquote>
+<p>2.2、在xml⽂件中定义颜⾊<br>在&#x2F;res&#x2F;values&#x2F;color.xml ⽂件中如下定义：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;resources&gt;</span><br><span class="line">    &lt;color name=&quot;red&quot;&gt;#ff0000&lt;/color&gt;</span><br><span class="line">    &lt;color name=&quot;green&quot;&gt;#00ff00&lt;/color&gt;</span><br><span class="line">&lt;/resources&gt;</span><br></pre></td></tr></table></figure>
+
+<p>详解： 在以上xml⽂件中定义了两个颜⾊，红⾊和绿⾊，是没有alpha（透明）通道的。<br>定义颜⾊以‘#’开头，后⾯跟⼗六进制的值，有如下⼏种定义⽅式：</p>
+<p>#f00            &#x2F;&#x2F;低精度 - 不带透明通道红⾊<br>#af00           &#x2F;&#x2F;低精度 - 带透明通道红⾊<br>#ff0000         &#x2F;&#x2F;⾼精度 - 不带透明通道红⾊<br>#aaff0000       &#x2F;&#x2F;⾼精度 - 带透明通道红⾊</p>
+<p>2.3、在java⽂件中引⽤xml中定义的颜⾊：<br>int color &#x3D; getResources().getColor(R.color.mycolor);</p>
+<p>2.3、在java⽂件中引⽤xml中定义的颜⾊：<br>int color &#x3D; getResources().getColor(R.color.mycolor);</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--在style⽂件中引⽤--&gt;</span><br><span class="line"></span><br><span class="line">&lt;style name=&quot;AppTheme&quot; parent=&quot;Theme.AppCompat.Light.DarkActionBar&quot;&gt;</span><br><span class="line">    &lt;item name=&quot;colorPrimary&quot;&gt;@color/red&lt;/item&gt;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line"></span><br><span class="line">android:background=&quot;@color/red&quot;     //引⽤在/res/values/color.xml 中定义的颜⾊</span><br><span class="line">android:background=&quot;#ff0000&quot;        //创建并使⽤颜⾊</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io">ajun</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view1/">https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhjun2016.github.io" target="_blank">逆风而行的蟋蟀</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/23/java%E8%87%AA%E5%AD%A6%E8%B5%84%E6%BA%90%E8%B7%AF%E7%BA%BF/" title="Java学习路线资源"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Java学习路线资源</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view2/" title="Android自定义View的三种实现方式总结"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Android自定义View的三种实现方式总结</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">ajun</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#android-view%E3%80%81%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E3%80%81%E6%BB%91%E5%8A%A8%E5%86%B2%E7%AA%81%E5%A4%84%E7%90%86%E3%80%81Scroller"><span class="toc-number">1.</span> <span class="toc-text">android view、事件分发、滑动冲突处理、Scroller</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%89%8D%E8%A8%80"><span class="toc-number">1.1.</span> <span class="toc-text">一、前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81view%E7%BB%93%E6%9E%84%E3%80%81%E5%B8%83%E5%B1%80"><span class="toc-number">1.2.</span> <span class="toc-text">二、view结构、布局</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#view%E6%A0%91%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="toc-number">1.2.1.</span> <span class="toc-text">view树结构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#View%E5%AE%9A%E4%B9%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">View定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ViewGroup%E5%AE%9A%E4%B9%89"><span class="toc-number">1.2.3.</span> <span class="toc-text">ViewGroup定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#View%E7%9A%84%E4%BD%8D%E7%BD%AE%E6%80%8E%E4%B9%88%E7%A1%AE%E5%AE%9A"><span class="toc-number">1.2.4.</span> <span class="toc-text">View的位置怎么确定</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">1.2.5.</span> <span class="toc-text">注意事项</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81view%E5%8E%9F%E7%90%86%E3%80%81%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-number">1.3.</span> <span class="toc-text">三、view原理、生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%88%9B%E5%BB%BA%E5%AF%B9%E8%B1%A1"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.创建对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-View%E7%9A%84%E7%BB%98%E5%88%B6%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.2.</span> <span class="toc-text">2.View的绘制原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#2-1-%E6%B5%8B%E9%87%8F-mesure"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">2.1 测量-mesure</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-2-%E5%B8%83%E5%B1%80-layout"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">2.2  布局- layout</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-3-%E7%BB%98%E5%88%B6-draw"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">2.3. 绘制- draw</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-4-%E8%A7%86%E5%9B%BE%E9%87%8D%E7%BB%98"><span class="toc-number">1.3.2.4.</span> <span class="toc-text">2.4 . 视图重绘</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%94%80%E6%AF%81"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.销毁</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86"><span class="toc-number">1.4.</span> <span class="toc-text">四、事件处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%89%8D%E8%A8%80"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. 前言</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E4%BA%8B%E4%BB%B6%E6%9C%BA%E5%88%B6%EF%BC%9A"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. 事件机制：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E6%BB%91%E5%8A%A8%E5%86%B2%E7%AA%81"><span class="toc-number">1.4.3.</span> <span class="toc-text">3.滑动冲突</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%80-%E6%BB%91%E5%8A%A8%E5%86%B2%E7%AA%81%E5%9C%BA%E6%99%AF%E4%BB%A5%E5%8F%8A%E4%BA%A7%E7%94%9F%E5%8E%9F%E5%9B%A0"><span class="toc-number">1.4.3.1.</span> <span class="toc-text">一.  滑动冲突场景以及产生原因</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BA%8C-%E6%BB%91%E5%8A%A8%E5%86%B2%E7%AA%81%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F"><span class="toc-number">1.4.3.2.</span> <span class="toc-text">二.  滑动冲突的解决方式</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#1%E3%80%81%E5%A4%96%E9%83%A8%E6%8B%A6%E6%88%AA%E6%B3%95-%EF%BC%88%E5%AD%90view%E4%BB%A3%E7%A0%81%E6%97%A0%E9%9C%80%E4%BF%AE%E6%94%B9%EF%BC%89%EF%BC%88%E7%AC%A6%E5%90%88view%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6%EF%BC%89"><span class="toc-number">1.4.3.2.1.</span> <span class="toc-text">1、外部拦截法 （子view代码无需修改）（符合view事件分发机制）</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#2%E3%80%81%E5%86%85%E9%83%A8%E6%8B%A6%E6%88%AA%E6%B3%95%EF%BC%88%E7%88%B6viewgroup%E9%9C%80%E8%A6%81%E9%87%8D%E5%86%99onInterceptTouchEvent%EF%BC%89%EF%BC%88%E4%B8%8D%E7%AC%A6%E5%90%88view%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6%EF%BC%89"><span class="toc-number">1.4.3.2.2.</span> <span class="toc-text">2、内部拦截法（父viewgroup需要重写onInterceptTouchEvent）（不符合view事件分发机制）</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%85%B6%E5%AE%83%E9%97%AE%E9%A2%98"><span class="toc-number">1.5.</span> <span class="toc-text">五、其它问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%9C%A8Android%E4%B8%AD%E5%8C%BA%E5%88%86%E7%82%B9%E5%87%BB%E5%92%8C%E6%BB%91%E5%8A%A8%E6%93%8D%E4%BD%9C"><span class="toc-number">1.5.1.</span> <span class="toc-text">1.在Android中区分点击和滑动操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-scrollTo-scrollBy-%E5%8C%BA%E5%88%AB"><span class="toc-number">1.5.2.</span> <span class="toc-text">2. scrollTo | scrollBy 区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-Scroller%EF%BC%9A"><span class="toc-number">1.5.3.</span> <span class="toc-text">3.Scroller：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-android%E4%B8%AD%E7%9A%84%E2%BE%93%E5%BA%A6%E5%92%8C%E5%BC%A7%E5%BA%A6"><span class="toc-number">1.5.4.</span> <span class="toc-text">4.android中的⾓度和弧度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5%E3%80%81%E9%A2%9C%E2%BE%8A"><span class="toc-number">1.5.5.</span> <span class="toc-text">5、颜⾊</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/android%20view%E6%A0%91%E7%BB%93%E6%9E%84%EF%BC%8C%E5%9D%90%E6%A0%87/" title="android view树结构、坐标">android view树结构、坐标</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/" title="Chocolatey介绍、安装、使用">Chocolatey介绍、安装、使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/c++%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" title="c++语言学习">c++语言学习</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/hexo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8/" title="hexo博客创建使用">hexo博客创建使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/git%E4%BD%BF%E7%94%A8%E6%8F%90%E4%BA%A4/" title="git安装使用">git安装使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By ajun</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

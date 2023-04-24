@@ -1,0 +1,290 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Android自定义View的三种实现方式总结 | 逆风而行的蟋蟀</title><meta name="author" content="ajun"><meta name="copyright" content="ajun"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Android自定义View的三种实现方式总结前言自定义控件的实现有三种方式：组合控件、自绘控件和继承控件。 自定义view一般6个步骤：  继承View的某个子类，包括ViewGroup的子类（毕竟ViewGroup也是View的子类） 重写继承的父类View的一些特定函数及常用的三个：（测量measure），(放置layout)，(绘制draw)    ３.为自定义View类增加属性（主要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android自定义View的三种实现方式总结">
+<meta property="og:url" content="https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view2/index.html">
+<meta property="og:site_name" content="逆风而行的蟋蟀">
+<meta property="og:description" content="Android自定义View的三种实现方式总结前言自定义控件的实现有三种方式：组合控件、自绘控件和继承控件。 自定义view一般6个步骤：  继承View的某个子类，包括ViewGroup的子类（毕竟ViewGroup也是View的子类） 重写继承的父类View的一些特定函数及常用的三个：（测量measure），(放置layout)，(绘制draw)    ３.为自定义View类增加属性（主要">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-04-23T02:26:53.000Z">
+<meta property="article:modified_time" content="2023-04-24T05:40:48.977Z">
+<meta property="article:author" content="ajun">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Android自定义View的三种实现方式总结',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-24 13:40:48'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="逆风而行的蟋蟀"><span class="site-name">逆风而行的蟋蟀</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Android自定义View的三种实现方式总结</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-24T05:40:48.977Z" title="更新于 2023-04-24 13:40:48">2023-04-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Android自定义View的三种实现方式总结"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+<h3 id="Android自定义View的三种实现方式总结"><a href="#Android自定义View的三种实现方式总结" class="headerlink" title="Android自定义View的三种实现方式总结"></a>Android自定义View的三种实现方式总结</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>自定义控件的实现有三种方式：组合控件、自绘控件和继承控件。</p>
+<p>自定义view一般6个步骤：</p>
+<ol>
+<li>继承View的某个子类，包括ViewGroup的子类（毕竟ViewGroup也是View的子类）</li>
+<li>重写继承的父类View的一些特定函数及常用的三个：（测量measure），(放置layout)，(绘制draw)</li>
+</ol>
+<p>  ３.为自定义View类增加属性（主要是在那三个<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E9%87%8D%E5%86%99&spm=1001.2101.3001.7020">重写</a>的构造方法里）</p>
+<p>  ４.绘制控件（代码形式导入布局）</p>
+<p>  ５.响应用户事件（单击、输入文字、触摸、滑动等等~~）</p>
+<p>  ６.定义回调函数（相当于反馈信息嘛）</p>
+<h4 id="绘制原理"><a href="#绘制原理" class="headerlink" title="绘制原理"></a><strong>绘制原理</strong></h4><h5 id="1-测量-measure"><a href="#1-测量-measure" class="headerlink" title="1.测量-measure:"></a>1.测量-measure:</h5><p>普通View的onMeasure逻辑大同小异，基本都是测量自身内容和背景，然后根据父View传递过来的MeasureSpec进行最终的大小判定，例如TextView会根据文字的长度，文字的大小，文字行高，文字的行宽，显示方式，背景图片，以及父View传递过来的模式和大小最终确定自身的大小。</p>
+<p>具体的View宽高测量是调用了 setMeasuredDimension() 方法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) &#123; </span><br><span class="line">   setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),   getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec)); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>onMeasure通过父View传递过来的大小和模式，以及自身的背景图片的大小得出自身最终的大小，通过setMeasuredDimension()方法设置给mMeasuredWidth和mMeasuredHeight。</p>
+<p><strong>ViewGroup:</strong></p>
+<p>ViewGroup本身没有实现onMeasure（但是！有setMeasuredDimension()方法），但是他的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%AD%90%E7%B1%BB&spm=1001.2101.3001.7020">子类</a>(比如：四大布局控件)都有各自的实现，通常他们都是通过measureChildWithMargins()这种测量内部子view的方法来遍历内部，测量子View。当所有的子View都测量完毕后，才根据父View传递过来的模式和大小来最终决定自身的大小。</p>
+<p>** <strong>注意事项</strong>：如果子View被GONE的将不参与测量。**</p>
+<p>ViewGroup一般都在测量完所有子View后才会调用setMeasuredDimension()设置自身大小。</p>
+<p>经过measure 完成后，我们就可以通过getMeasuredWidth&#x2F;Height 获取View 的宽高。 </p>
+<h5 id="2-布局-onLayout"><a href="#2-布局-onLayout" class="headerlink" title="2.布局-onLayout"></a>2.布局-onLayout</h5><p><strong>View:</strong></p>
+<p>普通View中的onLayout()这个函数为空函数。所以不用理会，想想也是的吧，如果你继承的是view，你还有摆放你里面的内容吗？如果里面有东西需要你的摆放，那么，这个view不就是父view了！这个不就该是继承的是ViewGroup。好的，往下看。</p>
+<p><strong>ViewGroup:</strong></p>
+<p>对于ViewGroup而言，循环遍历所有子View是主要的思想！！！因此如果我们继承ViewGroup 我们需要遍历执行所有的child.layout()。</p>
+<p>Layout方法中接受四个参数，是由父View提供，指定了子View在父View中的左、上、右、下的位置。父View在指定子View的位置时通常会根据子View在measure中测量的大小来决定。注意事项：子View的位置通常还受到父View的orientation，gravity，padding，子View的margin等等属性的影响哦，我相信写过在xml写过布局的各位大大肯定是了解的吧。</p>
+<p>ViewGroup中的onLayout()方法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@Override </span><br><span class="line">protected abstract void onLayout(boolean changed, int l, int t, int r, int b);</span><br></pre></td></tr></table></figure>
+
+<p>抽象就表示了继承ViewGroup的子类布局控件，都要去重写。而这个重写也就导致了，不同的布局方式。怎么重写呢？</p>
+<p>举个例子：我这里将第一个子控件通过layout()放置到左上角0,0 宽高是测量值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Override </span><br><span class="line">protected void onLayout(boolean changed, int l, int t, int r, int b) &#123;</span><br><span class="line">	View childView = getChildAt(0); childView.layout(0, 0, 	  childView.getMeasuredWidth(), childView.getMeasuredHeight()); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="3-绘制-draw"><a href="#3-绘制-draw" class="headerlink" title="3.绘制-draw"></a>3.绘制-draw</h5><p> draw()的过程就是绘制View到屏幕上的过程，draw()的执行遵循如下步骤：</p>
+<ol>
+<li>绘制背景<br>2.保存画布的图层来准备色变</li>
+<li>绘制内容<br>4.绘制children<br>5.画出褪色的边缘和恢复层</li>
+<li>绘制装饰 比如scollbar<br>2和5 可以跳过的。</li>
+</ol>
+<p><strong>View:</strong><br>view中onDraw()是个空函数，也就是说需要每个视图根据想要展示的内容来自行绘制，View是不会帮我们绘制内容部分的，因此需要每个视图根据想要展示的内容来自行绘制。</p>
+<p>如果你去观察TextView、ImageView等类的源码，你会发现它们都有重写onDraw()这个方法，并且在里面执行了相当不少的绘制逻辑: 在TextView中在该方法中绘制文字、光标和CompoundDrawable;ImageView中相对简单，只是绘制了图片。</p>
+<p>绘制的方式主要是借助Canvas这个类，它会作为参数传入到onDraw()方法中，供给每个视图使用。Canvas这个类的用法非常丰富，基本可以把它当成一块画布，在上面绘制任意的东西，那么我们就来尝试一下吧。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/5992feac84672181e4d50e11dacc2174.png" alt="5992feac84672181e4d50e11dacc2174.png"></p>
+<p>View 的绘制主要通过dispatchDraw(),先根据自身的padding剪裁画布，所有的子View都将在画布剪裁后的区域绘制。遍历所有子View，调用子View的computeScroll对子View的滚动值进行计算。</p>
+<p>根据滚动值和子View在父View中的坐标进行画布原点坐标的移动，根据子在父View中的坐标计算出子View的视图大小，然后对画布进行剪裁，请看下面的示意图。</p>
+<p><strong>ViewGroup：</strong></p>
+<p>对于ViewGroup则不需要实现该函数，因为作为容器是“没有内容“的（但必须ViewGroup要有实现dispatchDraw()函数，告诉子view去绘制自己）。<strong>注意事项：</strong>dispatchDraw的逻辑其实比较复杂，但ViewGroup已经处理好了，我们不必要重载该方法对子View进行绘制事件的派遣分发。</p>
+<p>三、其他一些可以用来重写的方法：</p>
+<p>onTouchEvent定义触屏事件来响应用户操作。 onKeyDown 当按下某个键盘时</p>
+<p>onKeyUp 当松开某个键盘时</p>
+<p>onTrackballEvent 当发生轨迹球事件时</p>
+<p>onSizeChange() 当该组件的大小被改变时</p>
+<p>onFinishInflate() 回调方法，当应用从XML加载该组件并用它构建界面之后调用的方法</p>
+<p>onWindowFocusChanged(boolean) 当该组件得到、失去焦点时</p>
+<p>onAttachedToWindow() 当把该组件放入到某个窗口时</p>
+<p>onDetachedFromWindow() 当把该组件从某个窗口上分离时触发的方法</p>
+<p>onWindowVisibilityChanged(int): 当包含该组件的窗口的可见性发生改变时触发的方法</p>
+<p><strong>View的绘制流程</strong></p>
+<p>绘制流程函数调用关系如下图（取来用之）：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/d41359f0f2030bc04574fdb7895b1314.png" alt="d41359f0f2030bc04574fdb7895b1314.png"></p>
+<h4 id="小知识点"><a href="#小知识点" class="headerlink" title="**小知识点 **"></a>**小知识点 **</h4><ol>
+<li><p>requestLayout(): 当view确定自身已经不再适合现有的区域时，该view本身调用requestLayout()方法来要求parent view（父类的视图）重新调用他的measure和layout来重新设置自己位置。特别是当view的layoutparameter发生改变，并且它的值还没能应用到view上时，这时候适合调用这个方法。<strong>注意，并不会不执行ondraw。</strong></p>
+</li>
+<li><p>invalidate()、postInvalidate()： 调用invalidate()、postInvalidate()会 界面刷新，执行 draw 过程。区别就是Invalidate不能直接在线程中调用，因为他是违背了单线程模型：Android UI操作并不是线程安全的，并且这些操作必须在UI线程中调用。</p>
+</li>
+</ol>
+<p>鉴于此，如果要使用invalidate的刷新，那我们就得配合handler的使用，使异步非ui线程转到ui线程中调用，如果要在非ui线程中直接使用就调用postInvalidate方法即可，这样就省去使用handler的烦恼。</p>
+<ol start="3">
+<li>onDraw、dispatchDraw区别</li>
+</ol>
+<p>​     onDraw()的意思是绘制视图自身，dispatchDraw()是绘制子视图，无论是View还是ViewGroup对它们俩的调用顺序都是onDraw()-&gt;dispatchDraw()。</p>
+<p>​    在View中，onDraw()和dispatchDraw()都会被调用的，所以我们无论把绘图代码放在onDraw()或者dispatchDraw()中都是可以得到效果的，但是由于dispatchDraw()的含义是绘制子控件，所以原则来上讲，在绘制View控件时，我们是重写onDraw()函数</p>
+<p>​     但在ViewGroup中，当它有背景的时候就会调用onDraw()方法，否则就会跳过onDraw()直接调用dispatchDraw()；所以如果要在ViewGroup中绘图时，往往是       重写dispatchDraw()方法。</p>
+<p>在View的onDraw中super.onDraw(canvas)和super.dispatchDraw(canvas)都是一个空实现，无影响；但是在ViewGroup中super.onDraw(canvas)和super.dispatchDraw(canvas)相反都为非空实现，如果先做super.dispatchDraw(canvas)，再做其它绘图操作的结果是：先把子View绘制出来，然后再画你的绘画操作，这样可能会造成你的绘画操作把子View给覆盖上； 相反，先做你的绘画操作然后再调用super.dispatchDraw(canvas)的结果是：先把的绘画操作给画出来，然后再画子View，子View会把的绘画操作结果给覆盖上。</p>
+<p><strong>结论：</strong>在绘制View控件时，需要重写onDraw()函数，在绘制ViewGroup时，需要重写dispatchDraw()函数。</p>
+<h4 id="自定义控件的三种方式"><a href="#自定义控件的三种方式" class="headerlink" title="自定义控件的三种方式"></a><strong>自定义控件的三种方式</strong></h4><h5 id="组合控件"><a href="#组合控件" class="headerlink" title="组合控件"></a><strong>组合控件</strong></h5><p>将一些小的控件组合起来形成的新控件，这些小控件可以是系统自带的控件，也可以是自定义的控件和系统控件混合组成；在构造函数中通过inflater和addView()方法加载自定义控件的布局文件形成图形界面（不需要onDraw方法）。不需要开发者重写onMeasure，onLayout，onDraw方法来实现测量、布局以及draw流程。所以，在实现自定义view的三种方式中，这一种相对比较简单。</p>
+<p>实际开发中，标题栏是常见的列子。简单的操作就是新建一个XML布局文件，将我们想要的控件搭配放入我们的布局中，位置等我们可以按需设置。最常见的莫过于我们几乎每个页面布局中顶部的标题状态栏了，如果页面多起来要我们每个页面重复写相同的布局代码想必每个人都要疯吧，反正我是想撞墙，所以将<strong>标题状态栏</strong>抽离出来形成一个自定义的组合控件。<a target="_blank" rel="noopener" href="https://www.cnblogs.com/whoislcj/p/5714760.html">相关文章解释</a></p>
+<h5 id="继承控件"><a href="#继承控件" class="headerlink" title="继承控件"></a><strong>继承控件</strong></h5><p>通过继承系统控件（View子类控件或ViewGroup子类控件），通过对已有控件的扩展来满足要求。即：继承TextView、Button这样已有的View（包括项目里已有的自定义View）。一般是希望在原有系统控件基础上做一些修饰性的修改，而不会做大幅度的改动，如在TextView的文字下方添加下划线，在LinearLayout布局中加一个蒙板等。这种方式往往都会复用系统控件的onMeasure和onLayout方法，而只需要重写onDraw方法，在其中绘制一些需要的内容。<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiayongji/p/5560806.html">文章解释</a></p>
+<h5 id="自绘控件"><a href="#自绘控件" class="headerlink" title="自绘控件"></a><strong>自绘控件</strong></h5><p>新建类通过继承View或ViewGroup生成新控件，这种控件可以说是最难的一种了，在View的onDraw方法中完成绘制，因为所有的绘制逻辑和流程都需要自己完成。采用自绘控件这种方式时，如果自定义View为最终的叶子控件，那么需要直接继承View；而不过自定义View为容器类控件，则需要直接继承ViewGroup。</p>
+<p>在自定义控件内部，通过画笔（Paint）和画布（Canvas）绘制控件，需要掌握绘图知识，事件分发，以及View的测量、布局、绘制等。知识的掌握需要比较牢固和广泛。<a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiayongji/p/5560806.html">文章解释</a></p>
+<h4 id="自定义View自定义属性"><a href="#自定义View自定义属性" class="headerlink" title="自定义View自定义属性"></a>自定义View自定义属性</h4><p>1、在values中编写需要的属性</p>
+<p>在res&#x2F;values&#x2F;下新建资源文件，这里咱们命名为attrs.xml，在其中编写所需要的属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">2 &lt;resources&gt;</span><br><span class="line">3     &lt;declare-styleable name=&quot;HistogramView&quot;&gt;</span><br><span class="line">4         &lt;attr name=&quot;textColor&quot; format=&quot;color&quot;/&gt;</span><br><span class="line">5         &lt;attr name=&quot;histogramColor&quot; format=&quot;color&quot;/&gt;</span><br><span class="line">6     &lt;/declare-styleable&gt;</span><br><span class="line">7 &lt;/resources&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这里中的name是自行命名的，可以理解为这个自定义属性集合的名称。</p>
+<p>2、在自定义View中引入属性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"> 1 public class HistogramView extends View&#123;</span><br><span class="line"> 2 </span><br><span class="line"> 3     private Paint mPaint;</span><br><span class="line"> 4     private Path mPath;</span><br><span class="line"> 5     private int mTextColor,mHistogramColor;</span><br><span class="line"> 6 </span><br><span class="line"> 7     public HistogramView(Context context, @Nullable AttributeSet attrs) &#123;</span><br><span class="line"> 8         super(context, attrs);</span><br><span class="line"> 9         mPaint = new Paint();</span><br><span class="line">10         mPath = new Path();</span><br><span class="line">11         initAttrs(context,attrs);</span><br><span class="line">12     &#125;</span><br><span class="line">13 </span><br><span class="line">14 /*           新增代码                               */</span><br><span class="line">15     private void initAttrs(Context context, AttributeSet attrs)&#123;</span><br><span class="line">16         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.HistogramView);</span><br><span class="line">17         mTextColor = typedArray.getColor(R.styleable.HistogramView_textColor,Color.BLACK);</span><br><span class="line">18         mHistogramColor = typedArray.getColor(R.styleable.HistogramView_histogramColor,Color.GREEN);</span><br><span class="line">19         typedArray.recycle();</span><br><span class="line">20     &#125;</span><br><span class="line">21 </span><br><span class="line">22     @Override</span><br><span class="line">23     protected void onDraw(Canvas canvas) &#123;</span><br><span class="line">24         super.onDraw(canvas);</span><br><span class="line">25         //绘制坐标轴</span><br><span class="line">26         mPaint.reset();</span><br><span class="line">27         mPath.reset();</span><br><span class="line">28         mPaint.setColor(Color.BLACK);</span><br><span class="line">29         mPaint.setStyle(Paint.Style.STROKE);</span><br><span class="line">30         mPath.moveTo(100,100);</span><br><span class="line">31         mPath.rLineTo(0,402);</span><br><span class="line">32         mPath.rLineTo(800,0);</span><br><span class="line">33         canvas.drawPath(mPath,mPaint);</span><br><span class="line">34         //绘制文字</span><br><span class="line">35         mPaint.reset();</span><br><span class="line">36         mPaint.setTextSize(30);</span><br><span class="line">37         mPaint.setColor(mTextColor);</span><br><span class="line">38         mPaint.setStyle(Paint.Style.FILL);</span><br><span class="line">39         canvas.drawText(&quot;Froyo&quot;,160,540,mPaint);</span><br><span class="line">40         canvas.drawText(&quot;CB&quot;,280,540,mPaint);</span><br><span class="line">41         canvas.drawText(&quot;ICS&quot;,380,540,mPaint);</span><br><span class="line">42         canvas.drawText(&quot;J&quot;,480,540,mPaint);</span><br><span class="line">43         canvas.drawText(&quot;KitKat&quot;,560,540,mPaint);</span><br><span class="line">44         canvas.drawText(&quot;L&quot;,690,540,mPaint);</span><br><span class="line">45         canvas.drawText(&quot;M&quot;,790,540,mPaint);</span><br><span class="line">46         //绘制直方图，柱形图是用较粗的直线来实现的</span><br><span class="line">47         mPaint.reset();</span><br><span class="line">48         mPaint.setColor(mHistogramColor);</span><br><span class="line">49         mPaint.setStrokeWidth(80);</span><br><span class="line">50         float[] lines3=&#123;</span><br><span class="line">51                 200,500,200,495,</span><br><span class="line">52                 300,500,300,480,</span><br><span class="line">53                 400,500,400,480,</span><br><span class="line">54                 500,500,500,300,</span><br><span class="line">55                 600,500,600,200,</span><br><span class="line">56                 700,500,700,150,</span><br><span class="line">57                 800,500,800,350,</span><br><span class="line">58         &#125;;</span><br><span class="line">59         canvas.drawLines(lines3,mPaint);</span><br><span class="line">60     &#125;</span><br><span class="line">61 &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>3、在布局文件中直接加入属性，在构造函数中去获得。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> 1 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line"> 2 &lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line"> 3     xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;</span><br><span class="line"> 4     android:layout_width=&quot;match_parent&quot;</span><br><span class="line"> 5     android:layout_height=&quot;match_parent&quot;&gt;</span><br><span class="line"> 6 </span><br><span class="line"> 7     &lt;com.example.demos.customviewdemo.HistogramView</span><br><span class="line"> 8         android:layout_width=&quot;match_parent&quot;</span><br><span class="line"> 9         android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">10         app:textColor=&quot;@android:color/holo_red_light&quot;</span><br><span class="line">11         app:histogramColor=&quot;@android:color/holo_blue_bright&quot;/&gt;</span><br><span class="line">12 </span><br><span class="line">13 &lt;/RelativeLayout&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意事项</strong>：*<em>命名空间： <strong>xmlns:前缀&#x3D;”<a target="_blank" rel="noopener" href="http://schemas.android.com/apk/res/%E5%8C%85%E5%90%8D%EF%BC%88%E6%88%96res-auto%EF%BC%89%E2%80%9D%EF%BC%8C%E5%89%8D%E7%BC%80:+%E4%BD%BF%E7%94%A8%E5%B1%9E%E6%80%A7%E3%80%82%E5%9C%A8%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%B1%9E%E6%80%A7%E5%80%BC%EF%BC%8C%E6%B3%A8%E6%84%8F%EF%BC%81%EF%BC%81%EF%BC%81%E6%88%91%E6%83%B3%E6%9C%89%E4%B8%80%E4%BA%9B%E4%BA%BA%E5%BA%94%E8%AF%A5%E4%BC%9A%E5%BE%88%E9%83%81%E9%97%B7">http://schemas.android.com/apk/res/包名（或res-auto）”，前缀:+使用属性。在构造函数中获取属性值，注意！！！我想有一些人应该会很郁闷</a> ，复制粘贴了自定义view.class后，发现自定义view的构造方法里面获得资源文件里的属性时</strong></em><em>，看到<a target="_blank" rel="noopener" href="http://r.styleable.xxx这个,然后点击时/">http://R.styleable.XXX这个，然后点击时</a></em>***找不到具体写的地方。其实这个就在res -&gt; values -&gt;attrs里。所以要记得去copy哦。</p>
+<p>四 自定义属性格式汇总</p>
+<p>在实际开发中，完全可以定义更多类型的属性，如显示文字的内容，文字的大小，直方图的宽度等。format也不只限定于“color”，还有“String”，“Integer”等，多种多样。本节就汇总一下平时比较常用的一些属性format。</p>
+<p>1、常用的11种format类型</p>
+<ul>
+<li><p>reference:引用资源</p>
+</li>
+<li><p>string:字符串</p>
+</li>
+<li><p>Color：颜色</p>
+</li>
+<li><p>boolean：布尔值</p>
+</li>
+<li><p>dimension：尺寸值</p>
+</li>
+<li><p>float：浮点型</p>
+</li>
+<li><p>integer：整型</p>
+</li>
+<li><p>fraction：百分数</p>
+</li>
+<li><p>enum：枚举类型</p>
+</li>
+<li><p>flag：位或运算</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"> 1 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line"> 2 &lt;resources&gt;</span><br><span class="line"> 3     &lt;declare-styleable name=&quot;SelfAttr&quot;&gt;</span><br><span class="line"> 4         &lt;!--1.reference：参考某一资源ID--&gt;</span><br><span class="line"> 5         &lt;attr name=&quot;background&quot; format=&quot;reference&quot; /&gt;</span><br><span class="line"> 6         &lt;!--2. color：颜色值--&gt;</span><br><span class="line"> 7         &lt;attr name = &quot;textColor&quot; format = &quot;color&quot; /&gt;</span><br><span class="line"> 8         &lt;!--3.boolean：布尔值--&gt;</span><br><span class="line"> 9         &lt;attr name = &quot;focusable&quot; format = &quot;boolean&quot; /&gt;</span><br><span class="line">10         &lt;!--4.dimension：尺寸值--&gt;</span><br><span class="line">11         &lt;attr name = &quot;layout_width&quot; format = &quot;dimension&quot; /&gt;</span><br><span class="line">12         &lt;!--5. float：浮点值--&gt;</span><br><span class="line">13         &lt;attr name = &quot;fromAlpha&quot; format = &quot;float&quot; /&gt;</span><br><span class="line">14         &lt;!--6.integer：整型值--&gt;</span><br><span class="line">15         &lt;attr name = &quot;lines&quot; format=&quot;integer&quot; /&gt;</span><br><span class="line">16         &lt;!--7.string：字符串--&gt;</span><br><span class="line">17         &lt;attr name = &quot;text&quot; format = &quot;string&quot; /&gt;</span><br><span class="line">18         &lt;!--8.fraction：百分数--&gt;</span><br><span class="line">19         &lt;attr name = &quot;pivotX&quot; format = &quot;fraction&quot; /&gt;</span><br><span class="line">20         &lt;!--9.enum：枚举值。属性值只能选择枚举值中的一个--&gt;</span><br><span class="line">21         &lt;attr name=&quot;orientation&quot;&gt;</span><br><span class="line">22             &lt;enum name=&quot;horizontal&quot; value=&quot;0&quot; /&gt;</span><br><span class="line">23             &lt;enum name=&quot;vertical&quot; value=&quot;1&quot; /&gt;</span><br><span class="line">24         &lt;/attr&gt;</span><br><span class="line">25         &lt;!--10.flag：位或运算。属性值可以选择其中多个值--&gt;</span><br><span class="line">26         &lt;attr name=&quot;gravity&quot;&gt;</span><br><span class="line">27             &lt;flag name=&quot;top&quot; value=&quot;0x01&quot; /&gt;</span><br><span class="line">28             &lt;flag name=&quot;bottom&quot; value=&quot;0x02&quot; /&gt;</span><br><span class="line">29             &lt;flag name=&quot;left&quot; value=&quot;0x04&quot; /&gt;</span><br><span class="line">30             &lt;flag name=&quot;right&quot; value=&quot;0x08&quot; /&gt;</span><br><span class="line">31             &lt;flag name=&quot;center_vertical&quot; value=&quot;0x16&quot; /&gt;</span><br><span class="line">32             ...</span><br><span class="line">33         &lt;/attr&gt;</span><br><span class="line">34         &lt;!--11.混合类型：属性定义时可以指定多种类型值--&gt;</span><br><span class="line">35         &lt;attr name = &quot;background_2&quot; format = &quot;reference|color&quot; /&gt;</span><br><span class="line">36     &lt;/declare-styleable&gt;</span><br><span class="line">37 &lt;/resources&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如上列出了平时工作中在常见的11种类型的格式，说是11种，但最后一种是前面10种的组合而已。看到上述的属性名称应该很熟悉吧，都是系统原生控件的属性名称。</p>
+<p><strong>总结</strong></p>
+<p>要完成一些酷炫的自定义View，还需要好好地掌握Canvas，Paint，Path等工具的使用，以及View的绘制流程原理。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io">ajun</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view2/">https://zhjun2016.github.io/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhjun2016.github.io" target="_blank">逆风而行的蟋蟀</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/23/android/android%E8%87%AA%E5%AE%9A%E4%B9%89view1/" title="android view、事件分发、滑动冲突处理、Scroller"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">android view、事件分发、滑动冲突处理、Scroller</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/23/android/android%E9%9D%A2%E8%AF%95/" title="题库"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">题库</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">ajun</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Android%E8%87%AA%E5%AE%9A%E4%B9%89View%E7%9A%84%E4%B8%89%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">Android自定义View的三种实现方式总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%98%E5%88%B6%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">绘制原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%B5%8B%E9%87%8F-measure"><span class="toc-number">1.2.1.</span> <span class="toc-text">1.测量-measure:</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E5%B8%83%E5%B1%80-onLayout"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.布局-onLayout</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E7%BB%98%E5%88%B6-draw"><span class="toc-number">1.2.3.</span> <span class="toc-text">3.绘制-draw</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%8F%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">**小知识点 **</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8E%A7%E4%BB%B6%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-number">1.4.</span> <span class="toc-text">自定义控件的三种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%84%E5%90%88%E6%8E%A7%E4%BB%B6"><span class="toc-number">1.4.1.</span> <span class="toc-text">组合控件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF%E6%8E%A7%E4%BB%B6"><span class="toc-number">1.4.2.</span> <span class="toc-text">继承控件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%87%AA%E7%BB%98%E6%8E%A7%E4%BB%B6"><span class="toc-number">1.4.3.</span> <span class="toc-text">自绘控件</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89View%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7"><span class="toc-number">1.5.</span> <span class="toc-text">自定义View自定义属性</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/android%20view%E6%A0%91%E7%BB%93%E6%9E%84%EF%BC%8C%E5%9D%90%E6%A0%87/" title="android view树结构、坐标">android view树结构、坐标</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/" title="Chocolatey介绍、安装、使用">Chocolatey介绍、安装、使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/c++%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" title="c++语言学习">c++语言学习</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/hexo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8/" title="hexo博客创建使用">hexo博客创建使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/git%E4%BD%BF%E7%94%A8%E6%8F%90%E4%BA%A4/" title="git安装使用">git安装使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By ajun</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

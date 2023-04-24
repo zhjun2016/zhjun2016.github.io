@@ -1,0 +1,209 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Chocolatey介绍、安装、使用 | 逆风而行的蟋蟀</title><meta name="author" content="ajun"><meta name="copyright" content="ajun"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Chocolatey介绍、安装、使用前言Chocolatey是用于Windows系统的一款软件管理工具。用于完成Windows中软件的搜索、安装、卸载等操作。既可以使用命令行完成也可以使用图形界面。 市面上有许多不同的安装程序格式和多种部署 Windows 软件的方法。 在 Windows 上部署没有包管理的软件可能既复杂又耗时。 Chocolatey 目标是在 Windows 操作系统上实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Chocolatey介绍、安装、使用">
+<meta property="og:url" content="https://zhjun2016.github.io/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="逆风而行的蟋蟀">
+<meta property="og:description" content="Chocolatey介绍、安装、使用前言Chocolatey是用于Windows系统的一款软件管理工具。用于完成Windows中软件的搜索、安装、卸载等操作。既可以使用命令行完成也可以使用图形界面。 市面上有许多不同的安装程序格式和多种部署 Windows 软件的方法。 在 Windows 上部署没有包管理的软件可能既复杂又耗时。 Chocolatey 目标是在 Windows 操作系统上实现">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-04-23T02:26:53.000Z">
+<meta property="article:modified_time" content="2023-04-24T05:51:06.867Z">
+<meta property="article:author" content="ajun">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhjun2016.github.io/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Chocolatey介绍、安装、使用',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-24 13:51:06'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="逆风而行的蟋蟀"><span class="site-name">逆风而行的蟋蟀</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Chocolatey介绍、安装、使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-24T05:51:06.867Z" title="更新于 2023-04-24 13:51:06">2023-04-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Chocolatey介绍、安装、使用"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+<h2 id="Chocolatey介绍、安装、使用"><a href="#Chocolatey介绍、安装、使用" class="headerlink" title="Chocolatey介绍、安装、使用"></a>Chocolatey介绍、安装、使用</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>Chocolatey是用于Windows系统的一款软件管理工具。用于完成Windows中软件的搜索、安装、卸载等操作。既可以使用命令行完成也可以使用图形界面。</p>
+<p>市面上有许多不同的安装程序格式和多种部署 Windows 软件的方法。 在 Windows 上部署没有包管理的软件可能既复杂又耗时。</p>
+<p>Chocolatey 目标是在 Windows 操作系统上实现从安装到升级和卸载的整个软件生命周期的自动化。通过一个统一的界面简化复杂的流程，让您可以控制混乱。同时也可设置环境变量，安装完软件，自动添加到环境变量。</p>
+<p>Chocolatey官网：<a target="_blank" rel="noopener" href="https://community.chocolatey.org/packages">https://community.chocolatey.org/packages</a></p>
+<p><img src="C:/Users/admin019/AppData/Roaming/Typora/typora-user-images/image-20220617102527897.png" alt="image-20220617102527897"></p>
+<h3 id="一、安装"><a href="#一、安装" class="headerlink" title="一、安装"></a>一、安装</h3><h4 id="1、系统要求"><a href="#1、系统要求" class="headerlink" title="1、系统要求"></a>1、系统要求</h4><p> Chocolatey 对内存的要求比较低. 对系统的要求:</p>
+<ul>
+<li>Windows 7+ &#x2F; Windows Server 2003+</li>
+<li>PowerShell v2+，至少是 v3</li>
+<li>NET Framework 4+ 至少是 4.5 （安装过程中会自动检测并下载）</li>
+</ul>
+<p>Chocolatey GUI 是一个在用户运行时运行的应用程序（也不是 Windows 服务）。<br> Chocolatey Agent（又名 Chocolatey-agent）是 Chocolatey for Business 中提供的一项 Windows 服务。 它用于自助安装和 Chocolatey 中央管理。</p>
+<h4 id="2、安装"><a href="#2、安装" class="headerlink" title="2、安装"></a>2、安装</h4><p>方法1、以管理员身份打开cmd.exe，执行以下代码：</p>
+<p>设置<strong>安装完软件，自动添加到环境变量。</strong></p>
+<blockquote>
+<p>@”%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe” -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command “iex ((New-Object <a target="_blank" rel="noopener" href="https://links.jianshu.com/go?to=http://System.Net.WebClient">System.Net.WebClient).DownloadString(‘https://chocolatey.org/install.ps1')</a>.DownloadString(‘https%3A%2F%2Fchocolatey.org%2Finstall.ps1’)))” &amp;&amp; SET “PATH&#x3D;%PATH%;%ALLUSERSPROFILE%\chocolatey\bin”</p>
+</blockquote>
+<p>方法2、以管理员权限打开Windows PowerShell，</p>
+<p>​           步骤1：在开始菜单上右键单击打开的菜单中选择“Windows终端（管理员）”</p>
+<img src="https://img-blog.csdnimg.cn/b2cc4446b53a460bb0dc5a4bc2811d8d.png" alt="img" style="zoom: 67%;" />
+
+<p>​       步骤2：在打开的“Windows PowerShell”中输入如下命令，然后回车，自动安装下载。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString(&#x27;https://community.chocolatey.org/install.ps1&#x27;))</span><br></pre></td></tr></table></figure>
+
+  <img src="https://img-blog.csdnimg.cn/6f8ca3243ac4431f85373d5fed2966d1.png" alt="img" style="zoom: 67%;" />
+
+<p><img src="https://img-blog.csdnimg.cn/ee9adebb7d7c4c20aed3a4424cda682c.png" alt="img"></p>
+<p>  步骤3：检验安装成功</p>
+<p>   安装后在Windows PowerShell中输入：choco</p>
+<p>   显示如下图所示版本号，则安装成功。</p>
+<p>  <img src="https://img-blog.csdnimg.cn/68d4560f708e4cee8c1155975b6f439c.png" alt="img"></p>
+<p> 方法3：直接打开<a target="_blank" rel="noopener" href="https://links.jianshu.com/go?to=https://chocolatey.org/install.ps1">https://chocolatey.org/install.ps1</a>,复制内容到本地新建 install.psl 文件，执行安装。</p>
+<p>注意：电脑安装防火墙的原因，可能会导致前两个方法出现问题，方法三不存在此问题，最好用 powershell.exe 来执行 install.psl 脚本，可以看到安装的完整过程。</p>
+<h3 id="二、使用"><a href="#二、使用" class="headerlink" title="二、使用"></a>二、使用</h3><h4 id="1、安装图形界面"><a href="#1、安装图形界面" class="headerlink" title="1、安装图形界面"></a>1、安装图形界面</h4><p>管理员powershell或者cmd命令窗口中输入一下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">choco install chocolateygui</span><br></pre></td></tr></table></figure>
+
+<p>安装之后输入 chocolateygui 打开图形界面（或在开始菜单中打开Chocolatey Gui 软件），选择左侧菜单中的chocolatey，安装你想安装的软件即可。</p>
+<p><img src="https://img-blog.csdnimg.cn/50a281a882464cb6a664d97c561f432c.png" alt="在这里插入图片描述"></p>
+<h4 id="2、常用命令"><a href="#2、常用命令" class="headerlink" title="2、常用命令"></a>2、常用命令</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">choco search cntlm //查找软件</span><br><span class="line"></span><br><span class="line">choco info cntlm  //查看软件详细信息</span><br><span class="line"></span><br><span class="line">//安装软件包</span><br><span class="line">choco install 软件包名称</span><br><span class="line">// 安装git：</span><br><span class="line">choco install git.install</span><br><span class="line">// 安装Chrome：</span><br><span class="line">choco install googlechrome</span><br><span class="line">// 安装VS Code：</span><br><span class="line">choco install vscode</span><br><span class="line"></span><br><span class="line">choco upgrade 软件包名称 //更新软件包</span><br><span class="line"></span><br><span class="line">choco uninstall 软件包名称  //卸载软件包</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//更新chocolatey命令</span><br><span class="line">choco upgrade chocolatey</span><br><span class="line"></span><br><span class="line">//更新chocolatey命令</span><br><span class="line">choco upgrade chocolatey</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="3、配置统一环境"><a href="#3、配置统一环境" class="headerlink" title="3、配置统一环境"></a>3、配置统一环境</h4><p>方法一：cmd.exe管理员模式下执行以下指令setx ChocolateyInstall D:\Chocolatey &#x2F;M</p>
+<p>方法二：powershell.exe管理员模式下执行以下指令&amp; setx.exe ChocolateyInstall D:\Chocolatey &#x2F;M</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io">ajun</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/">https://zhjun2016.github.io/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhjun2016.github.io" target="_blank">逆风而行的蟋蟀</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/23/android%20view%E6%A0%91%E7%BB%93%E6%9E%84%EF%BC%8C%E5%9D%90%E6%A0%87/" title="android view树结构、坐标"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">android view树结构、坐标</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/23/c++%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" title="c++语言学习"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">c++语言学习</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">ajun</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Chocolatey%E4%BB%8B%E7%BB%8D%E3%80%81%E5%AE%89%E8%A3%85%E3%80%81%E4%BD%BF%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">Chocolatey介绍、安装、使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%AE%89%E8%A3%85"><span class="toc-number">1.2.</span> <span class="toc-text">一、安装</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E7%B3%BB%E7%BB%9F%E8%A6%81%E6%B1%82"><span class="toc-number">1.2.1.</span> <span class="toc-text">1、系统要求</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E5%AE%89%E8%A3%85"><span class="toc-number">1.2.2.</span> <span class="toc-text">2、安装</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%BD%BF%E7%94%A8"><span class="toc-number">1.3.</span> <span class="toc-text">二、使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E5%AE%89%E8%A3%85%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2"><span class="toc-number">1.3.1.</span> <span class="toc-text">1、安装图形界面</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">1.3.2.</span> <span class="toc-text">2、常用命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E9%85%8D%E7%BD%AE%E7%BB%9F%E4%B8%80%E7%8E%AF%E5%A2%83"><span class="toc-number">1.3.3.</span> <span class="toc-text">3、配置统一环境</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/android%20view%E6%A0%91%E7%BB%93%E6%9E%84%EF%BC%8C%E5%9D%90%E6%A0%87/" title="android view树结构、坐标">android view树结构、坐标</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/" title="Chocolatey介绍、安装、使用">Chocolatey介绍、安装、使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/c++%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" title="c++语言学习">c++语言学习</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/hexo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8/" title="hexo博客创建使用">hexo博客创建使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/git%E4%BD%BF%E7%94%A8%E6%8F%90%E4%BA%A4/" title="git安装使用">git安装使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By ajun</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>列表数据错位 | 逆风而行的蟋蟀</title><meta name="author" content="ajun"><meta name="copyright" content="ajun"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="列表数据错位由于数据复用引起的，数据来源：1. 同步数据，2. 异步数据， 1.同步数据源解决办法：充分考虑条件，对itemView中每个view设置默认值； （itemBean为数据模型的字段，尽量使用字段记录view的状态） 12345if(itemBean.isChecked)&amp;#123;    textView.setText(&quot;展示&quot;);&amp;#125;else&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="列表数据错位">
+<meta property="og:url" content="https://zhjun2016.github.io/2023/04/23/android/%E5%88%97%E8%A1%A8%E5%A4%9A%E7%BC%96%E8%BE%91%E6%A1%86%E6%98%BE%E7%A4%BA/index.html">
+<meta property="og:site_name" content="逆风而行的蟋蟀">
+<meta property="og:description" content="列表数据错位由于数据复用引起的，数据来源：1. 同步数据，2. 异步数据， 1.同步数据源解决办法：充分考虑条件，对itemView中每个view设置默认值； （itemBean为数据模型的字段，尽量使用字段记录view的状态） 12345if(itemBean.isChecked)&amp;#123;    textView.setText(&quot;展示&quot;);&amp;#125;else&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:published_time" content="2023-04-23T02:26:53.000Z">
+<meta property="article:modified_time" content="2023-04-24T05:41:02.979Z">
+<meta property="article:author" content="ajun">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhjun2016.github.io/2023/04/23/android/%E5%88%97%E8%A1%A8%E5%A4%9A%E7%BC%96%E8%BE%91%E6%A1%86%E6%98%BE%E7%A4%BA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '列表数据错位',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-24 13:41:02'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="逆风而行的蟋蟀"><span class="site-name">逆风而行的蟋蟀</span></a></span><div id="menus"><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">列表数据错位</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-04-24T05:41:02.979Z" title="更新于 2023-04-24 13:41:02">2023-04-24</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="列表数据错位"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><meta name="referrer" content="no-referrer" />
+
+
+
+<h3 id="列表数据错位"><a href="#列表数据错位" class="headerlink" title="列表数据错位"></a>列表数据错位</h3><p>由于数据复用引起的，数据来源：1. 同步数据，2. 异步数据，</p>
+<h4 id="1-同步数据源"><a href="#1-同步数据源" class="headerlink" title="1.同步数据源"></a>1.同步数据源</h4><p>解决办法：充分考虑条件，对itemView中每个view设置默认值；</p>
+<p>（itemBean为数据模型的字段，尽量使用字段记录view的状态）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if(itemBean.isChecked)&#123;</span><br><span class="line">    textView.setText(&quot;展示&quot;);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    textView.setText(&quot;收起&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-异步数据源"><a href="#2-异步数据源" class="headerlink" title="2.异步数据源"></a>2.异步数据源</h4><p>场景：譬如ItemView 里面有 ImageView,通过一个url加载显示网络图片，等待服务器返回结果。假设一屏幕显示5条数据，滑动列表时，当前条目为第一条不可见时，第6条复用了第1条数据，导致图片显示错误。</p>
+<p>解决：对异步的view设置tag,绑定url，在使用地方取出tag，判断一致才显示；</p>
+<pre><code>holder.ivHead.setBackground(R.drawable.place_holder);
+//设置tag绑定异步地址
+holder.ivHead.setTag(itemBean.imageURL);
+//取出tag，判断
+String url=(String)(holder.ivHead.getTag());
+ if (TextUtils.equals(url, itemBean.imageURL)) &#123;
+    Glide.with(holder.ivHead).into(holder.ivHead).load(url);
+  &#125;
+</code></pre>
+<h4 id="常用解决办法"><a href="#常用解决办法" class="headerlink" title="常用解决办法"></a>常用解决办法</h4><h5 id="1-禁止复用"><a href="#1-禁止复用" class="headerlink" title="1.禁止复用"></a>1.禁止复用</h5><p>  导致列表性能差</p>
+<h5 id="2-listView复用"><a href="#2-listView复用" class="headerlink" title="2. listView复用"></a>2. listView复用</h5><p> 数据重复，性能差，加载慢，解决办法: 复用viewHolder</p>
+<p>复用view，提升性能</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> @Override</span><br><span class="line">public View getView(int position, View convertView, ViewGroup parent) &#123;</span><br><span class="line">    ViewHolder viewHolder;</span><br><span class="line">    if (convertView == null) &#123;</span><br><span class="line">        convertView = mInflater.inflate(R.layout.item_goods, parent,false);</span><br><span class="line">        viewHolder = new ViewHolder();</span><br><span class="line">        viewHolder.img = (ImageView) convertView.findViewById(R.id.image);</span><br><span class="line">        convertView.setTag(viewHolder);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        viewHolder = (ViewHolder) convertView.getTag();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p> 数据错乱</p>
+<p> 同时对每个view使用判断设置默认值，**<code>if - else解决</code>**</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (position == 3) &#123;</span><br><span class="line">     viewHolder.iv_bg.setBackgroundResource(R.drawable_green_bg);</span><br><span class="line">    &#125; else&#123;</span><br><span class="line">    viewHolder.iv_bg.setBackgroundResource(normal);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>异步数据，对view绑定tag，</p>
+<h5 id="3-recyerlyView优化"><a href="#3-recyerlyView优化" class="headerlink" title="3.recyerlyView优化"></a>3.recyerlyView优化</h5><p> 3.1  设置ViewHolder不可复用（尽量不要此方法）</p>
+<p>​		<em>viewHolder.setIsRecyclable(false)</em></p>
+<p> 3.2  onBindViewHolder中优化，处理数据显示问题</p>
+<ul>
+<li><p>通过onBindViewHolder中的position或者viewHolder的getAdapterPosition来判断展示。</p>
+</li>
+<li><p>如果是onBindViewHolder<code>没有被调用，</code></p>
+<p>原因1：多布局类型，没重写getItemViewType导致&#96;</p>
+<p>原因2：滑动缓存问题，</p>
+<p>当 RecyclerView 的条目很少的时候，比如只有六个，将 RecyclerView 从上滑动到下，这个时候是正常的，<code>onBindViewHolder</code> 会调用，不过此时从底部上划的时候，上方的 item 从不可见到可见的这个过程中，<code>onBindViewHolder</code> 并没有调用，这个时候我也就没办法进行一些刷新 item 的操作了。</p>
+<p>这个问题的原因是 <code>onBindViewHolder</code> 方法不调用导致的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">recyclerView.setItemViewCacheSize(int);</span><br></pre></td></tr></table></figure>
+
+<p>此api去调整 RecyclerView 的复用逻辑和方式来解决 <code>onBindViewHolder</code> 没有调用，设置 setViewCacheSize 来调整 mCachedViews 保存 ViewHolder 的大小，就能解决问题。</p>
+</li>
+</ul>
+<p>​		原因3：特殊情况不调用onBindViewHolder，可以监听 RecyclerView 的滑动，当滑动停止的时候，再调用 notify 刷新下列表也是可以的。此方法，经常优化用于滚动列表时，不更新数据。</p>
+<p>3.3  使用异步回调时，改变 <strong>onBindViewHolder</strong>中view的状态，刷新时机不对；</p>
+<p>   <strong>在异步回来之前Adapter调用了notifyDataSetChanged()等刷新方法导致ViewHolder被刷新复用导致。如果是这种情况，需要保证避免异步回来之前刷新即可解决。</strong></p>
+<h5 id="4-列表多编辑框editText引起错位"><a href="#4-列表多编辑框editText引起错位" class="headerlink" title="4.列表多编辑框editText引起错位"></a>4.列表多编辑框editText引起错位</h5><p>​	&#x2F;&#x2F;列表多编辑框EditText，出现数据错乱，解决方法就是及时移除、绑定TextWatcher</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">//第一步去掉EditText的TextWatcher</span><br><span class="line"> if (etValue.getTag() != null &amp;&amp; etValue.getTag() instanceof TextWatcher) &#123;</span><br><span class="line">            etValue.removeTextChangedListener(((TextWatcher) etValue.getTag()));</span><br><span class="line">            LogUtils.d(TAG, &quot;ValueAdapter===removeTextChangedListener&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line"> //第二步设置EditText的显示值</span><br><span class="line">   etValue.setText(ComUtils.getStrDecimalFormat(valueBean.decimalNum, value));</span><br><span class="line"> </span><br><span class="line"> //第三步设置TextWatcher逻辑过滤操作</span><br><span class="line"> TextWatcher etValueTextWatcher = new TextWatcher()&#123;</span><br><span class="line">	.....</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line">//第四步设置EditText添加TextWatcher逻辑过滤操作</span><br><span class="line"> etValue.addTextChangedListener(etValueTextWatcher);</span><br><span class="line"> etValue.setTag(etValueTextWatcher);</span><br></pre></td></tr></table></figure>
+
+
+
+<p> EditText软键盘弹出，遮挡列表软键盘</p>
+<p>项目中用了状态栏工具类com.gyf.immersionbar，导致软键盘设置弹出方式无效，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    //沉浸状态栏</span><br><span class="line">    protected void initStatusBar() &#123;</span><br><span class="line">        ImmersionBar.with(this)</span><br><span class="line">                .fitsSystemWindows(true)</span><br><span class="line">                .statusBarColor(R.color.colorPrimary2)</span><br><span class="line">                .statusBarDarkFont(false, 0f)</span><br><span class="line">//                //解决软键盘与底部输入框冲突问题</span><br><span class="line">                .keyboardEnable(true)</span><br><span class="line">                .init();</span><br><span class="line">        //ImmersionBar和软键盘冲突，影响布局</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用时候需要注意下设置ImmersionBar下的keyboardEnable</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io">ajun</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://zhjun2016.github.io/2023/04/23/android/%E5%88%97%E8%A1%A8%E5%A4%9A%E7%BC%96%E8%BE%91%E6%A1%86%E6%98%BE%E7%A4%BA/">https://zhjun2016.github.io/2023/04/23/android/%E5%88%97%E8%A1%A8%E5%A4%9A%E7%BC%96%E8%BE%91%E6%A1%86%E6%98%BE%E7%A4%BA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://zhjun2016.github.io" target="_blank">逆风而行的蟋蟀</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/04/23/android/android%E9%9D%A2%E8%AF%95/" title="题库"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">题库</div></div></a></div><div class="next-post pull-right"><a href="/2023/04/23/java/java%E9%9D%A2%E8%AF%95/" title="java题库"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">java题库</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">ajun</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">27</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%97%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%94%99%E4%BD%8D"><span class="toc-number">1.</span> <span class="toc-text">列表数据错位</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%90%8C%E6%AD%A5%E6%95%B0%E6%8D%AE%E6%BA%90"><span class="toc-number">1.1.</span> <span class="toc-text">1.同步数据源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%BC%82%E6%AD%A5%E6%95%B0%E6%8D%AE%E6%BA%90"><span class="toc-number">1.2.</span> <span class="toc-text">2.异步数据源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">常用解决办法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E7%A6%81%E6%AD%A2%E5%A4%8D%E7%94%A8"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.禁止复用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-listView%E5%A4%8D%E7%94%A8"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. listView复用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-recyerlyView%E4%BC%98%E5%8C%96"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.recyerlyView优化</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%88%97%E8%A1%A8%E5%A4%9A%E7%BC%96%E8%BE%91%E6%A1%86editText%E5%BC%95%E8%B5%B7%E9%94%99%E4%BD%8D"><span class="toc-number">1.3.4.</span> <span class="toc-text">4.列表多编辑框editText引起错位</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/android%20view%E6%A0%91%E7%BB%93%E6%9E%84%EF%BC%8C%E5%9D%90%E6%A0%87/" title="android view树结构、坐标">android view树结构、坐标</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/Chocolatey%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/" title="Chocolatey介绍、安装、使用">Chocolatey介绍、安装、使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/c++%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" title="c++语言学习">c++语言学习</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/hexo%E5%8D%9A%E5%AE%A2%E4%BD%BF%E7%94%A8/" title="hexo博客创建使用">hexo博客创建使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/23/git%E4%BD%BF%E7%94%A8%E6%8F%90%E4%BA%A4/" title="git安装使用">git安装使用</a><time datetime="2023-04-23T02:26:53.000Z" title="发表于 2023-04-23 10:26:53">2023-04-23</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By ajun</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
